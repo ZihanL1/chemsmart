@@ -174,6 +174,13 @@ def gaussian_quintet_opt_outfile(gaussian_outputs_test_directory):
     )
     return gaussian_quintet_opt_outfile
 
+# Gaussian output files for linkjob
+@pytest.fixture()
+def gaussian_linkjob_outfile(gaussian_outputs_test_directory):
+    gaussian_linkjob_outfile = os.path.join(
+        gaussian_outputs_test_directory, "iron_neutral_quintet.log"
+    )
+    return gaussian_linkjob_outfile
 
 # Gaussian output files for genecp
 @pytest.fixture()
@@ -1055,3 +1062,4 @@ def capture_log(caplog, tests_logger):
     """Fixture to capture log messages."""
     caplog.set_level(logging.INFO, logger="")  # Capture root logger
     yield caplog
+

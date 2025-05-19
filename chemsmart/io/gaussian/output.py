@@ -64,6 +64,24 @@ class Gaussian16Output(GaussianFileMixin):
         return False
 
     @property
+    def normal_termination_linkjob(self):
+        contents = str(self.contents)
+        if len(contents) == 0:
+            return False
+        segments = contents.split("Link1:")
+        results = True
+        error_jobs = []
+        for jobnumber, jobsegment in enumerate(segments, start=1):
+            if "Normal termination of Gaussian" not in jobsegment:
+                error_jobs.append(jobnumber)
+                results = False
+        if results:
+            logger.debug(f"File {self.filename} all jobs terminated normally.")
+        else:
+            logger.debug(f"File {self.filename} has error termination in jobs: {error_jobs}.")
+        return results
+
+    @property
     def heavy_elements(self):
         """TODO"""
         return None
