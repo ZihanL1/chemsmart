@@ -135,10 +135,6 @@ Trajectory Basic Usage
 
       chemsmart sub gaussian -p trajectory -f trajectory.xyz -c 0 -m 1 traj -j opt
 
-.. note::
-
-   The traj job will use rmsd grouper strategy as default.
-
 **Trajectory analysis with specific proportion of structures**
 
 -  to consider the last 30% of the structures in md.traj trajectory file:
