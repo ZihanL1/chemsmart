@@ -376,6 +376,8 @@ def mol(
     if filenames:
         if len(filenames) == 1:
             filenames = filenames[0]
+            if index is None:
+                index = "-1"
             molecules = Molecule.from_filepath(
                 filepath=filenames, index=index, return_list=True
             )
