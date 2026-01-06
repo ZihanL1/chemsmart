@@ -13,7 +13,6 @@ from chemsmart.cli.job import (
 from chemsmart.io.molecules.structure import Molecule
 from chemsmart.utils.cli import MyGroup
 from chemsmart.utils.io import clean_label
-from chemsmart.utils.utils import get_list_from_string_range
 
 logger = logging.getLogger(__name__)
 
@@ -350,6 +349,12 @@ def mol(
     # Initialize molecules variable
     molecules = None
 
+    if index is None:
+        index = "-1"
+        logger.debug("Use default index '-1'")
+    else:
+        logger.debug(f"Use {index} as index")
+
     # obtain molecule structure
     if directory is not None and filetype is not None:
         ctx.obj["directory"] = directory
@@ -376,8 +381,6 @@ def mol(
     if filenames:
         if len(filenames) == 1:
             filenames = filenames[0]
-            if index is None:
-                index = "-1"
             molecules = Molecule.from_filepath(
                 filepath=filenames, index=index, return_list=True
             )
@@ -415,32 +418,7 @@ def mol(
         label = os.path.splitext(os.path.basename(filenames))[0]
 
     label = clean_label(label)
-
-    logger.info(
-        f"Obtained molecules: {molecules} before applying indices,"
-        f"with label: {label}"
-    )
-
-    # if user has specified an index to use to access particular structure
-    # then return that structure as a list
-    if index is not None:
-        logger.debug(f"Using molecule with index: {index}")
-        try:
-            # try to get molecule using python style string indexing,
-            # but in 1-based
-            from chemsmart.utils.utils import string2index_1based
-
-            index = string2index_1based(index)
-            molecules = molecules[index]
-            if not isinstance(molecules, list):
-                molecules = [molecules]
-        except ValueError:
-            # except user defined indices such as s='[1-3,28-31,34-41]'
-            # or s='1-3,28-31,34-41' which cannot be parsed by string2index_1based
-            index = get_list_from_string_range(index)
-            molecules = [molecules[i - 1] for i in index]
-
-    logger.debug(f"Obtained molecules: {molecules}")
+    logger.info(f"Obtained molecules: {molecules} with label: {label}")
 
     # store objects
     ctx.obj["molecules"] = (
