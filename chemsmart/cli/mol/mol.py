@@ -317,7 +317,7 @@ def mol(
         if len(filenames) == 1:
             filenames = filenames[0]
             molecules = Molecule.from_filepath(
-                filepath=filenames, index=":", return_list=True
+                filepath=filenames, index=index, return_list=True
             )
             assert (
                 molecules is not None
