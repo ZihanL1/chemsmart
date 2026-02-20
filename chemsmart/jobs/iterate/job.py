@@ -9,11 +9,11 @@ logger = logging.getLogger(__name__)
 
 class IterateJob(Job):
     """
-    Job for generating molecular structures by attaching substituents to
-    skeletons.
+    Job for generating molecular structures
+    by attaching substituents to skeletons.
 
-    This job holds configuration from settings (skeleton_list,
-    substituent_list)
+    This job holds configuration from
+    settings (skeleton_list, substituent_list)
     and delegates all execution logic to IterateJobRunner.
     """
 
@@ -43,8 +43,8 @@ class IterateJob(Job):
         nprocs : int, optional
             Number of processes for parallel execution. Default 1.
         timeout : int, optional
-            Timeout in seconds for each worker process. Default 120 (2
-            minutes).
+            Timeout in seconds for each worker
+            process. Default 120 (2 minutes).
         outputfile : str, optional
             Output filename (without .xyz extension). Default is 'iterate_out'.
         separate_outputs : bool, optional
@@ -55,8 +55,8 @@ class IterateJob(Job):
             Additional keyword arguments
         """
         logger.debug("Initializing IterateJob")
-        # IterateJob doesn't use a single molecule, pass None and a default
-        # label
+        # IterateJob doesn't use a single
+        # molecule, pass None and a default label
         super().__init__(
             molecule=None,
             label="iterate_job",

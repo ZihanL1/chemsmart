@@ -1,6 +1,6 @@
 """
-Functions for querying PubChem for structures, adapted from ASE's pubchem.py
-module.
+Functions for querying PubChem for structures,
+adapted from ASE's pubchem.py module.
 """
 
 import logging
@@ -43,8 +43,8 @@ Retrying later (ideally respecting Retry-After if present) is appropriate.
 The server had an unexpected problem. Often transient.
 
 502 – Bad Gateway
-A gateway/proxy (load balancer) got an invalid response from an upstream
-server.
+A gateway/proxy (load balancer) got an
+invalid response from an upstream server.
 Often transient.
 
 503 – Service Unavailable
@@ -76,10 +76,10 @@ def search_pubchem_raw(search, field, suffix: str = "3d", timeout: int = 10):
 
     Args:
         search (str): The search term (e.g., CID, SMILES, name).
-        field (str): The field to search (e.g., 'cid', 'smiles', 'name',
-        'conformers').
-        suffix (str): The suffix for the request (e.g., '3d', '2d'). Default is
-        '3d'.
+        field (str): The field to search (e.g.,
+        'cid', 'smiles', 'name', 'conformers').
+        suffix (str): The suffix for the request
+        (e.g., '3d', '2d'). Default is '3d'.
         timeout (int): Request timeout in seconds. Default is 10.
 
     Returns:
@@ -87,8 +87,8 @@ def search_pubchem_raw(search, field, suffix: str = "3d", timeout: int = 10):
 
     Raises:
         requests.exceptions.Timeout: If the request times out.
-        requests.exceptions.HTTPError: For HTTP-related errors (e.g., 404,
-        400).
+        requests.exceptions.HTTPError: For
+        HTTP-related errors (e.g., 404, 400).
         requests.exceptions.RequestException: For other network issues.
     """
     suffix = "sdf?record_type=" + suffix
@@ -144,8 +144,8 @@ def search_pubchem_raw(search, field, suffix: str = "3d", timeout: int = 10):
     wait=wait_exponential(multiplier=2, min=2, max=20) + wait_random(0, 2),
     # Wait 2, 4, 8, 16 seconds (max 20s) + random 0-2s
     retry=retry_if_exception(_retryable_pubchem),
-    # Retry on timeout, retryable HTTP errors, and other network-related
-    # RequestExceptions
+    # Retry on timeout, retryable HTTP errors,
+    # and other network-related RequestExceptions
     before_sleep=lambda retry_state: logger.debug(
         f"Retrying PubChem search (attempt {retry_state.attempt_number}) "
         f"after {retry_state.idle_for}s..."
@@ -162,13 +162,13 @@ def pubchem_search(*args, fail_silently=True, **kwargs):
 
     Args:
         *args: Variable positional arguments for search.
-        fail_silently (bool): If True, return None on failure instead of
-        raising an error.
+        fail_silently (bool): If True, return None
+        on failure instead of raising an error.
         **kwargs: Keyword arguments for search (e.g., cid, smiles, name).
 
     Returns:
-        Molecule or None: The molecule object or None if retrieval fails and
-        fail_silently=True.
+        Molecule or None: The molecule object or None
+        if retrieval fails and fail_silently=True.
 
     Raises:
         ValueError: If structure cannot be retrieved and fail_silently=False.
@@ -284,10 +284,10 @@ def _pubchem_2d_to_3d(data):
         # Add explicit hydrogens for complete molecular representation
         mol2 = Chem.AddHs(mol)
 
-        # RDKit can fail to embed molecules, which would return a returncode of
-        # -1.
-        # Try with random coords if it fails, which is supposed to help. See
-        # e.g.:
+        # RDKit can fail to embed molecules,
+        # which would return a returncode of -1.
+        # Try with random coords if it fails,
+        # which is supposed to help. See e.g.:
         # https://github.com/rdkit/rdkit/issues/2996#issuecomment-606464769
         returncode = _embed_molecule(mol2, use_random_coords=False)
         if returncode != 0:

@@ -1,8 +1,8 @@
 """
 ORCA job runner implementation.
 
-This module contains the job runner classes for executing ORCA quantum
-chemistry
+This module contains the job runner classes
+for executing ORCA quantum chemistry
 calculations on different computing environments, including both real and fake
 runners for testing purposes.
 """
@@ -32,8 +32,8 @@ class ORCAJobRunner(JobRunner):
     ORCA-specific job runner.
 
     This class handles the execution of ORCA quantum chemistry calculations
-    with support for scratch directories, file management, and various job
-    types.
+    with support for scratch directories,
+    file management, and various job types.
 
     Attributes:
         JOBTYPES (list): Supported job types handled by this runner.
@@ -315,8 +315,8 @@ class ORCAJobRunner(JobRunner):
 
         if self.scratch:
             logger.debug(f"Running directory: {self.running_directory}")
-            # if job was run in scratch, copy files to job folder except files
-            # containing .tmp
+            # if job was run in scratch, copy files to
+            # job folder except files containing .tmp
             for file in glob(f"{self.running_directory}/{job.label}*"):
                 if not file.endswith((".tmp", ".tmp.*")):
                     logger.info(
@@ -340,8 +340,8 @@ class FakeORCAJobRunner(ORCAJobRunner):
 
     Attributes:
         PROGRAM (str): Program identifier ('orca').
-        JOBTYPES (list): Supported job types handled (inherits from
-        ORCAJobRunner).
+        JOBTYPES (list): Supported job types
+        handled (inherits from ORCAJobRunner).
         FAKE (bool): True for this runner to indicate fake mode.
         SCRATCH (bool): Whether to use scratch directories (inherits default).
         server: Server configuration used for execution.

@@ -253,8 +253,8 @@ class TestORCAInput:
     def test_orca_qmmm_input(self, orca_inputs_directory):
         orca_inp1 = os.path.join(orca_inputs_directory, "dna_qmmm1.inp")
         orca_inp1 = ORCAQMMMInput(filename=orca_inp1)
-        # charge and multiplicity of QM region (instead of real system in
-        # regular input)
+        # charge and multiplicity of QM region
+        # (instead of real system in regular input)
         assert orca_inp1.qm_charge == 2
         assert orca_inp1.qm_multiplicity == 1
         assert orca_inp1.qm_atoms == [
@@ -2672,9 +2672,8 @@ class TestORCAQMMM:
 
 class TestORCAQMMMJobSettings:
     def test_partition_string_single_and_list_input(self):
-        """Partition string should accept '1-15,37,39' or list and compress
-        ranges.
-        """
+        """Partition string should accept
+        '1-15,37,39' or list and compress ranges."""
         from chemsmart.jobs.orca.settings import ORCAQMMMJobSettings
 
         s = ORCAQMMMJobSettings()
@@ -2688,9 +2687,8 @@ class TestORCAQMMMJobSettings:
         assert out2.strip() == "QMAtoms {0:14 36 38} end"
 
     def test_partition_string_qm_and_qm2(self):
-        """When both high_level_atoms and medium_level_atoms provided, both
-        lines should be returned.
-        """
+        """When both high_level_atoms and medium_level_atoms
+        provided, both lines should be returned."""
         from chemsmart.jobs.orca.settings import ORCAQMMMJobSettings
 
         s = ORCAQMMMJobSettings()
@@ -2703,13 +2701,12 @@ class TestORCAQMMMJobSettings:
         assert lines[1].strip() == "QM2Atoms {6:8 11} end"
 
     def test_charge_and_multiplicity_population(self):
-        """ORCAQMMMJobSettings should populate .charge and .multiplicity from
-        intermediate or high fields.
-        """
+        """ORCAQMMMJobSettings should populate .charge and
+        .multiplicity from intermediate or high fields."""
         from chemsmart.jobs.orca.settings import ORCAQMMMJobSettings
 
-        # when both high and intermediate specified, high-region takes
-        # precedence
+        # when both high and intermediate
+        # specified, high-region takes precedence
         s1 = ORCAQMMMJobSettings(
             charge_intermediate=0,
             mult_intermediate=1,

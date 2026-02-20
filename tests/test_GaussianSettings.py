@@ -162,8 +162,8 @@ class TestGaussianQMMMJobSettings:
         )
         # assert settings3.route_string == "#
         # oniom(mn15/def2svp:uff:b3lyp/6-31g(d):uff)"
-        # ValueError: For high level of theory, one should specify only
-        # functional/basis or force field!
+        # ValueError: For high level of theory, one should
+        # specify only functional/basis or force field!
         with pytest.raises(ValueError):
             settings3.route_string
 
@@ -295,8 +295,8 @@ class TestGaussianQMMMJobSettings:
             "L",
         ]
 
-        # Test for 3-layer ONIOM calculation with example input
-        # dppeFeCl2_phenyldioxazolone_qmmm.com
+        # Test for 3-layer ONIOM calculation with example
+        # input dppeFeCl2_phenyldioxazolone_qmmm.com
         # mol2 = QMMM(molecule=Molecule._read_gaussian_inputfile(
         #     os.path.join(
         #         gaussian_inputs_test_directory,

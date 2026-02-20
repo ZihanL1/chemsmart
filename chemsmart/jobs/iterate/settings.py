@@ -21,8 +21,8 @@ class IterateJobSettings:
         config_file : str, optional
             Path to the TOML configuration file.
         method : str, optional
-            Mathematical method to use for position optimization. Default is
-            'lagrange_multipliers'.
+            Mathematical method to use for position
+            optimization. Default is 'lagrange_multipliers'.
         sphere_direction_samples_num : int, optional
             Number of points to sample on the unit sphere. Default is 96.
         axial_rotations_sample_num : int, optional

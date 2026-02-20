@@ -27,12 +27,12 @@ ALLOWED_SUBSTITUENT_KEYS = {
 
 ITERATE_TEMPLATE = """# Chemsmart Iterate Configuration Template
 # =========================================
-# This template defines skeletons and substituents for iterative
-# structure generation.
+# This template defines skeletons and
+# substituents for iterative structure generation.
 #
 # Structure Sources:
-#   - file_path: Path to molecular structure file
-#                (.xyz, .com, .log, .sdf, etc.)
+# - file_path: Path to molecular structure
+# file (.xyz, .com, .log, .sdf, etc.)
 #
 # Required Fields:
 #   - label: Unique identifier for this structure
@@ -41,11 +41,11 @@ ITERATE_TEMPLATE = """# Chemsmart Iterate Configuration Template
 # Optional Fields:
 #   - skeleton_indices: Atom indices to keep, format: "1, 3-10, 15" (1-based)
 #                       If not specified, all atoms except link_index are kept
-#                       IMPORTANT: If specified, link_index MUST be included
-#                       in skeleton_indices, otherwise an error will occur.
+# IMPORTANT: If specified, link_index MUST be included
+# in skeleton_indices, otherwise an error will occur.
 #
-# Note: Index values may be provided as integers, lists, or strings
-# (ranges/comma-separated).
+# Note: Index values may be provided as integers,
+# lists, or strings (ranges/comma-separated).
 
 # =============================================================================
 # SKELETONS
@@ -89,8 +89,8 @@ link_index = "1"
 # 2. link_index specifies the atom that will form the new bond
 # 3. For skeletons, the atom at link_index is typically replaced/removed
 # 4. For substituents, the atom at link_index bonds to the skeleton
-# 5. skeleton_indices format: "1, 3-10, 15, 20-25" (ranges and
-# individual indices)
+# 5. skeleton_indices format: "1, 3-10, 15,
+# 20-25" (ranges and individual indices)
 """
 
 
@@ -148,8 +148,8 @@ def _parse_index_string(
     value : int, str, or None
         The value to parse
     entry_type : str
-        "skeleton" or "substituent" (for error messages context, though
-        currently unused for errors)
+        "skeleton" or "substituent" (for error messages
+        context, though currently unused for errors)
     idx : int
         Entry index
     field_name : str
@@ -182,8 +182,8 @@ def _parse_index_string(
         elif isinstance(value, list) and all(
             isinstance(x, int) for x in value
         ):
-            # Already a list of ints (though TOML parser usually handles this,
-            # sometimes flexible)
+            # Already a list of ints (though TOML parser
+            # usually handles this, sometimes flexible)
             parsed_indices = value
 
         if parsed_indices is not None:
@@ -213,8 +213,8 @@ def _parse_index_string(
             param_hint="'-f' / '--filename'",
         )
 
-    # If it's not None, not Int, and not String (or string parsing failed
-    # silently elsewhere)
+    # If it's not None, not Int, and not String
+    # (or string parsing failed silently elsewhere)
     raise click.BadParameter(
         f"{entry_type.capitalize()} entry {idx + 1}: '{field_name}' has invalid type {type(value).__name__}.",
         param_hint="'-f' / '--filename'",
@@ -458,8 +458,8 @@ def _validate_skeleton_entry(entry: dict, idx: int, filename: str) -> dict:
     for key in ALLOWED_SKELETON_KEYS:
         value = entry.get(key)
 
-        # Special handling for link_index and skeleton_indices: parse to
-        # list[int]
+        # Special handling for link_index and
+        # skeleton_indices: parse to list[int]
         if key == "link_index":
             normalized[key] = _parse_index_string(
                 value, "skeleton", idx, "link_index"

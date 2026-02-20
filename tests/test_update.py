@@ -51,9 +51,8 @@ class TestUpdater:
             tmp_path.unlink()
 
     def test_underscore_dash_equivalence(self):
-        """Test that underscore and dash package names are treated as
-        equivalent.
-        """
+        """Test that underscore and dash package
+        names are treated as equivalent."""
         updater = Updater()
 
         # Create a temporary requirements file with underscore
@@ -73,8 +72,8 @@ class TestUpdater:
             try:
                 missing = updater._get_missing_dependencies(tmp_path)
 
-                # Should not consider pytest_mock as missing since pytest-mock
-                # exists
+                # Should not consider pytest_mock as
+                # missing since pytest-mock exists
                 assert (
                     len(missing) == 0
                 ), f"Expected no missing deps, got: {missing}"
@@ -84,9 +83,8 @@ class TestUpdater:
             tmp_path.unlink()
 
     def test_dash_underscore_equivalence(self):
-        """Test that dash and underscore package names are treated as
-        equivalent.
-        """
+        """Test that dash and underscore package
+        names are treated as equivalent."""
         updater = Updater()
 
         # Create a temporary requirements file with dash
@@ -106,8 +104,8 @@ class TestUpdater:
             try:
                 missing = updater._get_missing_dependencies(tmp_path)
 
-                # Should not consider scikit-learn as missing since
-                # scikit_learn exists
+                # Should not consider scikit-learn as
+                # missing since scikit_learn exists
                 assert (
                     len(missing) == 0
                 ), f"Expected no missing deps, got: {missing}"

@@ -229,8 +229,8 @@ class TestStructures:
 
         all_molecules = xyz_file.get_molecules(index=":", return_list=True)
 
-        # set correct charge and multiplicity for molecules as needed by
-        # pymatgen checks
+        # set correct charge and multiplicity for
+        # molecules as needed by pymatgen checks
         molecules = []
         for molecule in all_molecules:
             molecule.charge = 1
@@ -1100,8 +1100,8 @@ class TestChemicalFeatures:
             1.0,
             1.0,
         ]
-        # check there are 6 aromatic C-C bonds and 6 single C-H bonds in
-        # benzene
+        # check there are 6 aromatic C-C bonds
+        # and 6 single C-H bonds in benzene
         assert len([bond for bond in benzene.bond_orders if bond == 1.5]) == 6
         assert len([bond for bond in benzene.bond_orders if bond == 1.0]) == 6
 
@@ -1120,8 +1120,8 @@ class TestChemicalFeatures:
         """
         ozone = Molecule.from_filepath(gaussian_ozone_opt_outfile)
 
-        # Test pyvoro-based method (optional, may not be available in Python
-        # 3.12+)
+        # Test pyvoro-based method (optional,
+        # may not be available in Python 3.12+)
         try:
             ozone_vd_vol = ozone.voronoi_dirichlet_occupied_volume
             assert ozone_vd_vol > 0
@@ -1136,8 +1136,8 @@ class TestChemicalFeatures:
         assert np.isclose(
             ozone.crude_volume_by_atomic_radii, 3.612781286145805, rtol=0.01
         )
-        # vdw_volume uses exact lens-shaped intersection formula for overlap
-        # correction
+        # vdw_volume uses exact lens-shaped
+        # intersection formula for overlap correction
         assert np.isclose(ozone.vdw_volume, 29.65124427436735, rtol=0.01)
         # grid_vdw_volume uses grid-based integration (similar to RDKit)
         assert np.isclose(ozone.grid_vdw_volume, 31.464, rtol=0.05)
@@ -1172,8 +1172,8 @@ class TestChemicalFeatures:
             12.369068467588548,
             rtol=0.01,
         )
-        # vdw_volume uses exact lens-shaped intersection formula for overlap
-        # correction
+        # vdw_volume uses exact lens-shaped
+        # intersection formula for overlap correction
         assert np.isclose(acetone.vdw_volume, 48.85540325089168, rtol=0.01)
         # grid_vdw_volume uses grid-based integration (similar to RDKit)
         assert np.isclose(acetone.grid_vdw_volume, 64.832, rtol=0.05)
@@ -1420,8 +1420,8 @@ class TestQMMMinMolecule:
         assert methyl_3_hexane.num_atoms == 23
         with pytest.raises(ValueError):
             methyl_3_hexane.partition_level_strings
-            # should raise error since high + medium + low is not equal to
-            # total number of atoms
+            # should raise error since high + medium +
+            # low is not equal to total number of atoms
 
     def test_atoms_in_levels_default_low_level(
         self,
@@ -1895,9 +1895,8 @@ class TestCDXFile:
 
 
 def test_qmmm_partition_overlap_raises():
-    """Creating a QMMMMolecule with overlapping partitions should raise a
-    ValueError.
-    """
+    """Creating a QMMMMolecule with overlapping
+    partitions should raise a ValueError."""
     # Create a small dummy molecule
     symbols = ["C"] * 5
     positions = np.zeros((5, 3))

@@ -46,8 +46,8 @@ class TestGaussianJobs:
             g16_file, gaussian_written_opt_file, shallow=False
         )  # writes input file as expected
 
-        # job run will result in the job being run and the output file copied
-        # back to run folder
+        # job run will result in the job being run and
+        # the output file copied back to run folder
         # job.run(jobrunner=jobrunner_no_scratch)
         # assert job.is_complete()
 
@@ -90,8 +90,7 @@ class TestGaussianJobs:
                 " -1 " in lines[i + 8]
             )  # 8 lines before the coordinates in Gaussian input file
             # this structure has frozen atoms at these positions,
-            # see
-            # test_structure.py::TestMoleculeAdvanced::
+            # see test_structure.py::TestMoleculeAdvanced::
             # test_molecule_from_db_with_pbc_and_constraints.py
             # mol object (last structure/image).
 
@@ -119,13 +118,12 @@ class TestGaussianJobs:
                 " -1 " in lines[i + 8]
             )  # 8 lines before the coordinates in Gaussian input file
             # this structure has frozen atoms at these positions,
-            # see
-            # test_structure.py::TestMoleculeAdvanced::
+            # see test_structure.py::TestMoleculeAdvanced::
             # test_molecule_from_db_with_pbc_and_constraints.py
             # mol2 object (first structure/image).
 
-        # job3 will fail to be created because the index is not valid
-        # (1-indexed)
+        # job3 will fail to be created because
+        # the index is not valid (1-indexed)
         with pytest.raises(ValueError):
             GaussianOptJob.from_filename(
                 filename=constrained_pbc_db_file,
@@ -401,9 +399,8 @@ class TestGaussianCrestJobs:
         gaussian_yaml_settings_gas_solv_project_name,
         gaussian_jobrunner_no_scratch,
     ):
-        """Test that GaussianCrestJob creates jobs for all conformers in the
-        file.
-        """
+        """Test that GaussianCrestJob creates
+        jobs for all conformers in the file."""
         from chemsmart.io.molecules.structure import Molecule
         from chemsmart.jobs.gaussian.crest import GaussianCrestJob
         from chemsmart.settings.gaussian import GaussianProjectSettings

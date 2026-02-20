@@ -1,11 +1,11 @@
 # Chemsmart Iterate Configuration Template
 # =========================================
-# This template defines skeletons and substituents for iterative
-# structure generation.
+# This template defines skeletons and
+# substituents for iterative structure generation.
 #
 # Structure Sources:
-#   - file_path: Path to molecular structure file
-#                (.xyz, .com, .log, .sdf, etc.)
+# - file_path: Path to molecular structure
+# file (.xyz, .com, .log, .sdf, etc.)
 #
 # Required Fields:
 #   - label: Unique identifier for this structure
@@ -14,11 +14,11 @@
 # Optional Fields:
 #   - skeleton_indices: Atom indices to keep, format: "1, 3-10, 15" (1-based)
 #                       If not specified, all atoms except link_index are kept
-#                       IMPORTANT: If specified, link_index MUST be included
-#                       in skeleton_indices, otherwise an error will occur.
+# IMPORTANT: If specified, link_index MUST be included
+# in skeleton_indices, otherwise an error will occur.
 #
-# Note: Index values may be provided as integers, lists, or strings
-# (ranges/comma-separated).
+# Note: Index values may be provided as integers,
+# lists, or strings (ranges/comma-separated).
 
 # =============================================================================
 # SKELETONS
@@ -62,5 +62,5 @@ link_index = "1"
 # 2. link_index specifies the atom that will form the new bond
 # 3. For skeletons, the atom at link_index is typically replaced/removed
 # 4. For substituents, the atom at link_index bonds to the skeleton
-# 5. skeleton_indices format: "1, 3-10, 15, 20-25" (ranges and
-# individual indices)
+# 5. skeleton_indices format: "1, 3-10, 15,
+# 20-25" (ranges and individual indices)

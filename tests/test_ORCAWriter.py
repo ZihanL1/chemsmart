@@ -47,8 +47,8 @@ class TestORCAInputWriter:
             orca_file, orca_written_opt_file, shallow=False
         )  # writes input file as expected
 
-        # job run will result in the job being run and the output file copied
-        # back to run folder
+        # job run will result in the job being run and
+        # the output file copied back to run folder
         # job.run()
         # assert job.is_complete()
 

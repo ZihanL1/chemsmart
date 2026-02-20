@@ -1,10 +1,10 @@
 """
 ORCA job settings implementation.
 
-This module contains the settings classes for configuring ORCA quantum
-chemistry
-calculations, including general settings and specialized settings for
-transition
+This module contains the settings classes
+for configuring ORCA quantum chemistry
+calculations, including general settings
+and specialized settings for transition
 state and IRC calculations.
 """
 
@@ -666,17 +666,17 @@ class ORCATSJobSettings(ORCAJobSettings):
 
     Attributes:
         inhess (bool): Read initial Hessian if True.
-        inhess_filename (str | None): Path to initial Hessian file (used when
-        inhess=True).
+        inhess_filename (str | None): Path to
+        initial Hessian file (used when inhess=True).
         hybrid_hess (bool): Use hybrid Hessian scheme.
-        hybrid_hess_atoms (list[int] | None): 1‑based atom indices for hybrid
-        Hessian region.
+        hybrid_hess_atoms (list[int] | None): 1‑based
+        atom indices for hybrid Hessian region.
         numhess (bool): Use numerical Hessian.
         recalc_hess (int): Frequency (in cycles) to recalculate Hessian.
         trust_radius (float | None): Trust radius for optimization.
         tssearch_type (str): TS search method ('optts' or 'scants').
-        scants_modred (list | dict | None): Modredundant coordinates for
-        ScanTS.
+        scants_modred (list | dict | None):
+        Modredundant coordinates for ScanTS.
         full_scan (bool): If True, do not abort ScanTS after highest point.
     """
 
@@ -755,36 +755,36 @@ class ORCAIRCJobSettings(ORCAJobSettings):
     Attributes:
         maxiter (int | None): Maximum number of IRC iterations.
         printlevel (int | None): Verbosity level for IRC output.
-        direction (str | None): IRC direction ('both', 'forward', 'backward',
-        'down').
-        inithess (str | None): Initial Hessian specification ('read',
-        'calc_anfreq', 'calc_numfreq').
+        direction (str | None): IRC direction
+        ('both', 'forward', 'backward', 'down').
+        inithess (str | None): Initial Hessian specification
+        ('read', 'calc_anfreq', 'calc_numfreq').
         hess_filename (str | None): Hessian filename when inithess='read'.
-        hessmode (int | None): Hessian mode index used for initial
-        displacement.
+        hessmode (int | None): Hessian mode
+        index used for initial displacement.
         init_displ (str | None): Initial displacement type ('DE' or 'length').
         scale_init_displ (float | None): Step size for initial displacement.
-        de_init_displ (float | None): Target energy difference for initial
-        displacement (Eh or mEh as per ORCA).
-        follow_coordtype (str | None): Coordinate type to follow (typically
-        'cartesian').
+        de_init_displ (float | None): Target energy difference
+        for initial displacement (Eh or mEh as per ORCA).
+        follow_coordtype (str | None): Coordinate
+        type to follow (typically 'cartesian').
         scale_displ_sd (float | None): Scaling factor for the first SD step.
         adapt_scale_displ (bool | None): Adapt SD step scaling dynamically.
-        sd_parabolicfit (bool | None): Use parabolic fit to optimize SD step
-        length.
-        interpolate_only (bool | None): Restrict parabolic fit to interpolation
-        only.
+        sd_parabolicfit (bool | None): Use
+        parabolic fit to optimize SD step length.
+        interpolate_only (bool | None): Restrict
+        parabolic fit to interpolation only.
         do_sd_corr (bool | None): Apply correction to the first SD step.
-        scale_displ_sd_corr (float | None): Scaling factor for SD correction
-        step.
-        sd_corr_parabolicfit (bool | None): Use parabolic fit for the
-        correction step.
+        scale_displ_sd_corr (float | None):
+        Scaling factor for SD correction step.
+        sd_corr_parabolicfit (bool | None): Use
+        parabolic fit for the correction step.
         tolrmsg (float | None): RMS gradient tolerance (a.u.).
         tolmaxg (float | None): Max gradient element tolerance (a.u.).
-        monitor_internals (bool | None): Print selected internal coordinates
-        during IRC.
-        internal_modred (list | dict | None): Internal coordinates (B/A/D/I) to
-        monitor when monitor_internals=True.
+        monitor_internals (bool | None): Print
+        selected internal coordinates during IRC.
+        internal_modred (list | dict | None): Internal coordinates
+        (B/A/D/I) to monitor when monitor_internals=True.
     """
 
     def __init__(
@@ -894,48 +894,51 @@ class ORCAIRCJobSettings(ORCAJobSettings):
                             # backward
                             # down
         # Initial displacement
-            InitHess read # by default ORCA uses the Hessian from AnFreq or
-            NumFreq, or computes a new one
-                            # read - reads the Hessian that is defined via
-                            # Hess_Filename
+            InitHess read # by default ORCA uses the Hessian
+            from AnFreq or NumFreq, or computes a new one
+                            # read - reads the Hessian that
+                            # is defined via Hess_Filename
                             # calc_anfreq  - computes the analytic Hessian
                             # calc_numfreq - computes the numeric Hessian
-            Hess_Filename "h2o.hess" # Hessian for initial displacement, must
-            be used together with InitHess = read
-            hessMode 0 # Hessian mode that is used for the initial
-            displacement. Default 0
+            Hess_Filename "h2o.hess" # Hessian for initial
+            displacement, must be used together with InitHess = read
+            hessMode 0 # Hessian mode that is used
+            for the initial displacement. Default 0
             Init_Displ DE      # DE (default) - energy difference
                                # length       - step size
-            Scale_Init_Displ 0.1 # step size for initial displacement from TS.
-            Default 0.1 a.u.
-            DE_Init_Displ 2.0 # energy difference that is expected for initial
-            displacement
+            Scale_Init_Displ 0.1 # step size for initial
+            displacement from TS. Default 0.1 a.u.
+            DE_Init_Displ 2.0 # energy difference
+            that is expected for initial displacement
                                  #  based on provided Hessian (Default: 2 mEh)
         # Steps
             Follow_CoordType cartesian # default and only option
-            Scale_Displ_SD 0.15 # Scaling factor for scaling the 1st SD step
-            Adapt_Scale_Displ true # modify Scale_Displ_SD when the step size
-            becomes smaller or larger
-            SD_ParabolicFit true # Do a parabolic fit for finding an optimal SD
-            step length
-            Interpolate_only true # Only allow interpolation for parabolic fit,
-            not extrapolation
+            Scale_Displ_SD 0.15 # Scaling
+            factor for scaling the 1st SD step
+            Adapt_Scale_Displ true # modify Scale_Displ_SD
+            when the step size becomes smaller or larger
+            SD_ParabolicFit true # Do a parabolic
+            fit for finding an optimal SD step length
+            Interpolate_only true # Only allow interpolation
+            for parabolic fit, not extrapolation
             Do_SD_Corr        true  # Apply a correction to the 1st SD step
-            Scale_Displ_SD_Corr 0.333 # Scaling factor for scaling the
-            correction step to the SD step.
-                                       # It is multiplied by the length of the
-                                       # final 1st SD step
-            SD_Corr_ParabolicFit true # Do a parabolic fit for finding an
-            optimal correction
+            Scale_Displ_SD_Corr 0.333 # Scaling factor for
+            scaling the correction step to the SD step.
+                                       # It is multiplied by the length
+                                       # of the final 1st SD step
+            SD_Corr_ParabolicFit true # Do a parabolic
+            fit for finding an optimal correction
                                        # step length
         # Convergence thresholds - similar to LooseOpt
             TolRMSG   5.e-4      # RMS gradient (a.u.)
             TolMaxG   2.e-3      # Max. element of gradient (a.u.)
         # Output options
-            Monitor_Internals # Up to three internal coordinates can be defined
-                {B 0 1} # for which the values are printed during the IRC run.
-                {B 1 5} # Possible are (B)onds, (A)ngles, (D)ihedrals and
-                (I)mpropers
+            Monitor_Internals # Up to three
+            internal coordinates can be defined
+                {B 0 1} # for which the values
+                are printed during the IRC run.
+                {B 1 5} # Possible are (B)onds,
+                (A)ngles, (D)ihedrals and (I)mpropers
             end
         end.
         """
@@ -1009,31 +1012,31 @@ class ORCAQMMMJobSettings(ORCAJobSettings):
         jobtype (str): Multiscale calculation type
         high_level_functional (str): DFT functional for high-level (QM) region
         high_level_basis (str): Basis set for high-level (QM) region
-        intermediate_level_functional (str): DFT functional for
-        intermediate-level (QM2) region
-        intermediate_level_basis (str): Basis set for intermediate-level (QM2)
-        region
-        intermediate_level_method (str): Built-in method for intermediate-level
-        (XTB, HF-3C, etc.)
+        intermediate_level_functional (str): DFT
+        functional for intermediate-level (QM2) region
+        intermediate_level_basis (str): Basis
+        set for intermediate-level (QM2) region
+        intermediate_level_method (str): Built-in
+        method for intermediate-level (XTB, HF-3C, etc.)
         low_level_method (str): Method/force field for low-level (MM) region
         high_level_atoms (list): Atom indices for high-level (QM) region
-        intermediate_level_atoms (list): Atom indices for intermediate-level
-        (QM2) region
+        intermediate_level_atoms (list): Atom
+        indices for intermediate-level (QM2) region
         charge_total (int): Total system charge
         mult_total (int): Total system multiplicity
         charge_intermediate (int): Intermediate layer charge
         mult_intermediate (int): Intermediate layer multiplicity
         charge_high (int): High-level region charge
         mult_high (int): High-level region multiplicity
-        intermediate_level_solvation (str): Solvation model for
-        intermediate-level region
+        intermediate_level_solvation (str):
+        Solvation model for intermediate-level region
         active_atoms (list): Active atoms for optimization
         use_active_info_from_pbc (bool): Use PDB active atom info
         optregion_fixed_atoms (list): Fixed atoms in optimization
         high_level_h_bond_length (dict): Custom high-level-H bond distances
         delete_la_double_counting (bool): Remove bend/torsion double counting
-        delete_la_bond_double_counting_atoms (bool): Remove bond double
-        counting
+        delete_la_bond_double_counting_atoms
+        (bool): Remove bond double counting
         embedding_type (str): Electronic or mechanical embedding
         conv_charges (bool): Use converged charges for crystal QM/MM
         conv_charges_max_n_cycles (int): Max charge convergence cycles
@@ -1101,33 +1104,33 @@ class ORCAQMMMJobSettings(ORCAJobSettings):
         Initialize ORCA QM/MM job settings.
 
         Args:
-            jobtype: Type of multiscale calculation (QMMM, QM/QM2, QM/QM2/MM,
-            etc.)
+            jobtype: Type of multiscale calculation
+            (QMMM, QM/QM2, QM/QM2/MM, etc.)
             high_level_functional: DFT functional for high-level (QM) region
             high_level_basis: Basis set for high-level (QM) region
-            intermediate_level_functional: DFT functional for
-            intermediate-level (QM2) region
-            intermediate_level_basis: Basis set for intermediate-level (QM2)
-            region
-            intermediate_level_method: Built-in method for intermediate-level
-            (XTB, HF-3C, PBEH-3C, etc.)
-            low_level_method: Method/force field for low-level (MM) region
-            (MMFF, AMBER, CHARMM, etc.)
+            intermediate_level_functional: DFT functional
+            for intermediate-level (QM2) region
+            intermediate_level_basis: Basis set
+            for intermediate-level (QM2) region
+            intermediate_level_method: Built-in method for
+            intermediate-level (XTB, HF-3C, PBEH-3C, etc.)
+            low_level_method: Method/force field for
+            low-level (MM) region (MMFF, AMBER, CHARMM, etc.)
             high_level_atoms: Atom indices for high-level (QM) region
-            intermediate_level_atoms: Atom indices for intermediate-level (QM2)
-            region
+            intermediate_level_atoms: Atom indices
+            for intermediate-level (QM2) region
             charge_total: Total system charge
             mult_total: Total system multiplicity
             charge_intermediate: Intermediate layer charge (QM2)
             mult_intermediate: Intermediate layer multiplicity (QM2)
             charge_high: High-level region charge
             mult_high: High-level region multiplicity
-            intermediate_level_solvation: Solvation model for
-            intermediate-level (CPCM, SMD, etc.)
+            intermediate_level_solvation: Solvation model
+            for intermediate-level (CPCM, SMD, etc.)
             active_atoms: Active atom indices (default: whole system)
             optregion_fixed_atoms: Fixed atom indices in optimization
-            high_level_h_bond_length: Custom bond lengths {(atom1, atom2):
-            length}
+            high_level_h_bond_length: Custom
+            bond lengths {(atom1, atom2): length}
             delete_la_double_counting: Remove bend/torsion double counting
             delete_la_bond_double_counting_atoms: Remove bond double counting
             embedding_type: Electronic (default) or mechanical embedding
@@ -1135,8 +1138,8 @@ class ORCAQMMMJobSettings(ORCAJobSettings):
             conv_charges_max_n_cycles: Max cycles for charge convergence
             conv_charges_conv_thresh: Convergence threshold for charges
             scale_formal_charge_mm_atom: MM atomic charge scaling factor
-            n_unit_cell_atoms: Atoms per unit cell (required for
-            MOL-CRYSTAL-QMMM)
+            n_unit_cell_atoms: Atoms per unit
+            cell (required for MOL-CRYSTAL-QMMM)
             ecp_layer_ecp: ECP type for boundary region
             ecp_layer: Number of ECP layers around QM region
             scale_formal_charge_ecp_atom: ECP atomic charge scaling factor
@@ -1189,8 +1192,8 @@ class ORCAQMMMJobSettings(ORCAJobSettings):
         self.functional = self.high_level_functional
         self.basis = self.high_level_basis
 
-        # Set charge/multiplicity with fallback priority: high -> intermediate
-        # -> total
+        # Set charge/multiplicity with fallback
+        # priority: high -> intermediate -> total
         if self.charge_high is not None and self.mult_high is not None:
             self.charge = self.charge_high
             self.multiplicity = self.mult_high
@@ -1198,10 +1201,10 @@ class ORCAQMMMJobSettings(ORCAJobSettings):
             self.charge_intermediate is not None
             and self.mult_intermediate is not None
         ):
-            # the charge/multiplicity of the intermediate system corresponds to
-            # the
-            # sum of the charge/multiplicity of the high level and low level
-            # regions
+            # the charge/multiplicity of the
+            # intermediate system corresponds to the
+            # sum of the charge/multiplicity of
+            # the high level and low level regions
             self.charge = self.charge_intermediate
             self.multiplicity = self.mult_intermediate
         elif self.charge_total is not None and self.mult_total is not None:
@@ -1240,14 +1243,14 @@ class ORCAQMMMJobSettings(ORCAJobSettings):
 
     def _validate_intermediate_parameters(self):
         """
-        Validate that intermediate-level parameters are provided when needed
-        and not provided when not needed.
+        Validate that intermediate-level parameters are
+        provided when needed and not provided when not needed.
 
         Raises:
-            ValueError: If QM2 layer is required but intermediate parameters
-            are missing,
-                       or if intermediate parameters are provided but QM2 layer
-                       is not required.
+            ValueError: If QM2 layer is required
+            but intermediate parameters are missing,
+                       or if intermediate parameters are
+                       provided but QM2 layer is not required.
         """
         # Check if intermediate parameters are provided
         has_intermediate_params = (
@@ -1319,8 +1322,8 @@ class ORCAQMMMJobSettings(ORCAJobSettings):
         self, functional, basis, built_in_method, level_name
     ):
         """
-        Validate and assign level of theory for high/intermediate/low-level
-        layers.
+        Validate and assign level of theory
+        for high/intermediate/low-level layers.
 
         Args:
             functional: DFT functional
@@ -1525,10 +1528,10 @@ class ORCAQMMMJobSettings(ORCAJobSettings):
         """
         Generate charge and multiplicity lines for %qmmm block.
 
-        Returns charge/multiplicity for total system (QM/MM) or intermediate
-        system (QM/QM2/MM).
-        ORCA specifies total/intermediate charge/multiplicity in %qmmm block
-        while
+        Returns charge/multiplicity for total system
+        (QM/MM) or intermediate system (QM/QM2/MM).
+        ORCA specifies total/intermediate
+        charge/multiplicity in %qmmm block while
         high-level charge/multiplicity are specified in the coordinate section.
 
         Returns:
@@ -1544,8 +1547,8 @@ class ORCAQMMMJobSettings(ORCAJobSettings):
 
     def _get_partition_string(self):
         """
-        Generate atom partition specifications for high-level and
-        intermediate-level regions.
+        Generate atom partition specifications for
+        high-level and intermediate-level regions.
 
         Returns:
             str: Partition block with QMAtoms and QM2Atoms directives
@@ -1574,8 +1577,8 @@ class ORCAQMMMJobSettings(ORCAJobSettings):
         and compresses contiguous sequences into compact range notation.
 
         Args:
-            atom_id: Atom specification (list/tuple of ints, string ranges,
-            etc.)
+            atom_id: Atom specification (list/tuple
+            of ints, string ranges, etc.)
 
         Returns:
             str: Formatted string with ranges and individual atoms
@@ -1595,8 +1598,8 @@ class ORCAQMMMJobSettings(ORCAJobSettings):
             try:
                 atoms = get_list_from_string_range(atom_id)
             except Exception:
-                # Fallback simple parser: split on commas/spaces, handle ranges
-                # like '1-5' or '1:5'
+                # Fallback simple parser: split on commas/spaces,
+                # handle ranges like '1-5' or '1:5'
                 tokens = re.split(r"[,\s]+", atom_id.strip())
                 atoms = []
                 for tok in tokens:
@@ -1624,8 +1627,8 @@ class ORCAQMMMJobSettings(ORCAJobSettings):
         if not atoms:
             return None
 
-        # Convert user-facing 1-indexed atom ids to ORCA's 0-indexed
-        # requirement
+        # Convert user-facing 1-indexed atom
+        # ids to ORCA's 0-indexed requirement
         if min(atoms) > 0:
             atoms = [a - 1 for a in atoms]
 
@@ -1655,8 +1658,8 @@ class ORCAQMMMJobSettings(ORCAJobSettings):
         Generate complete %qmmm block for ORCA multiscale calculations.
 
         Constructs the full %qmmm block containing all necessary parameters
-        for QM/MM calculations including atom partitions, charges, force
-        fields,
+        for QM/MM calculations including atom
+        partitions, charges, force fields,
         embedding options, and crystal-specific parameters.
 
         Returns:
@@ -1709,8 +1712,8 @@ class ORCAQMMMJobSettings(ORCAJobSettings):
                     f'QM2CustomFile "{self.intermediate_level_method}" end\n'
                 )
         else:
-            # If custom intermediate-level functional/basis provided, include
-            # them
+            # If custom intermediate-level
+            # functional/basis provided, include them
             if (
                 self.intermediate_level_functional is not None
                 and self.intermediate_level_functional.strip()
@@ -1779,8 +1782,8 @@ class ORCAQMMMJobSettings(ORCAJobSettings):
         Generate crystal-specific parameters for %qmmm block.
 
         Creates parameter block for MOL-CRYSTAL-QMMM and IONIC-CRYSTAL-QMMM
-        calculations including charge convergence, ECP settings, and scaling
-        factors.
+        calculations including charge convergence,
+        ECP settings, and scaling factors.
 
         Returns:
             str: Crystal QM/MM parameter block
@@ -1817,8 +1820,8 @@ class ORCAQMMMJobSettings(ORCAJobSettings):
         """
         Compare two ORCAQMMMJobSettings objects for equality.
 
-        Compares all attributes between two ORCA QMMM settings objects,
-        including the
+        Compares all attributes between two ORCA
+        QMMM settings objects, including the
         QMMM-specific attributes that are not present in the parent class.
 
         Args:
@@ -1835,8 +1838,8 @@ class ORCAQMMMJobSettings(ORCAJobSettings):
         self_dict = self.__dict__.copy()
         other_dict = other.__dict__.copy()
 
-        # Exclude append_additional_info from the comparison (inherited
-        # behavior)
+        # Exclude append_additional_info from
+        # the comparison (inherited behavior)
         self_dict.pop("append_additional_info", None)
         other_dict.pop("append_additional_info", None)
 
