@@ -214,7 +214,8 @@ def is_pubchem_api_available():
 
     try:
         response = requests.get(test_url, timeout=5)
-        # Accept 200 (success) or even 404 (not found) - both mean API is responding
+        # Accept 200 (success) or even 404 (not found) - both mean API is
+        # responding
         # Reject 503 (busy), 500 (server error), etc.
         return response.status_code in (200, 404)
     except (requests.exceptions.RequestException, OSError):

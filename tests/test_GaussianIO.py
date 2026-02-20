@@ -39,7 +39,7 @@ class TestRouteString:
             r1b.additional_opt_options_in_route is None
         )  # noeigentest prevents Gaussian from stopping
         # if no negative Hessian eigenvalue was found
-        #                                                   # (not additional opt options for geometry opt)
+        # # (not additional opt options for geometry opt)
         assert r1b.additional_route_parameters is None
 
     def test_read_route_string_standard3a(self):
@@ -1555,7 +1555,8 @@ class TestGaussian16Output:
             0,
         ]
 
-        # since use_frozen is False, this is not included in the output structure
+        # since use_frozen is False, this is not included in the output
+        # structure
         assert g16_hide_frozen.optimized_structure.frozen_atoms is None
 
         assert g16_hide_frozen.optimized_structure.energy == -804.614710796

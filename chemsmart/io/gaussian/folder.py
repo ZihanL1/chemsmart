@@ -93,7 +93,8 @@ class GaussianLogFolder(BaseFolder):
     @property
     def total_service_units(self):
         """
-        Get all service units used in all the log files contained in the folder.
+        Get all service units used in all the log files contained in the
+        folder.
         """
         total_service_units = 0
         for file in self.all_logfiles:

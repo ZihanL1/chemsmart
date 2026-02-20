@@ -17,7 +17,8 @@ class ORCAInput(ORCAFileMixin):
     """
     Parser for ORCA quantum chemistry input files.
 
-    This class provides comprehensive parsing capabilities for ORCA input files,
+    This class provides comprehensive parsing capabilities for ORCA input
+    files,
     extracting molecular coordinates, calculation parameters, job settings, and
     other computational directives. It handles both embedded coordinates and
     external coordinate file references.
@@ -207,7 +208,8 @@ class ORCAInput(ORCAFileMixin):
                         if "maxiter" in line:
                             # Find the index of "maxiter" in the same line
                             index = line.index("maxiter")
-                            # Find the substring immediately following "maxiter"
+                            # Find the substring immediately following
+                            # "maxiter"
                             num_maxiter = line[
                                 index + len("maxiter") :
                             ].split()[0]

@@ -67,5 +67,7 @@ export g16root=~/programs/g16
         # assert list(server_yaml.yaml_contents_dict.keys())[0] == "SERVER"
         # assert list(server_yaml.yaml_contents_dict.keys())[1] == "GAUSSIAN"
         # assert list(server_yaml.yaml_contents_dict.keys())[2] == "ORCA"
-        # assert server_yaml.yaml_contents_dict["GAUSSIAN"]["G16FOLDER"] == "~/programs/g16"
-        # assert server_yaml.yaml_contents_dict["ORCA"]["ORCAFOLDER"] == "~/programs/orca_6_0_0"
+        # assert server_yaml.yaml_contents_dict["GAUSSIAN"]["G16FOLDER"] ==
+        # "~/programs/g16"
+        # assert server_yaml.yaml_contents_dict["ORCA"]["ORCAFOLDER"] ==
+        # "~/programs/orca_6_0_0"

@@ -18,7 +18,8 @@ orca_mayer_population_analysis_line_pattern = rf"^\s*(?:\+?\d+)\s+{element_token
 xyz_filename_pattern = r"([^\s\"']+\.xyz\b)"
 # \b ensures that the match ends right after xyz
 # and is not followed by something like: xyz1, xyzabc xyz_thing
-# It will match if .xyz is followed by: a space, a quote, end of line, punctuation
+# It will match if .xyz is followed by: a space, a quote, end of line,
+# punctuation
 
 normal_mode_pattern = r"\s*(\d+)\s+(\d+)((?:\s+[+-]?\d*\.\d+)+)\s*"
 frozen_coordinates_pattern = (
@@ -68,7 +69,8 @@ sdf_pattern = (
 # Constraining bond angles : { A N1 N2 N1 value C }
 # Constraining dihedral angles : { D N1 N2 N3 N4 value C }
 # Constraining cartesian coordinates : { C N1 C }
-# where the value is optional, by default it is the present value in the structure
+# where the value is optional, by default it is the present value in the
+# structure
 constrained_bond_length_pattern_in_input = (
     r"\|\s*(\d+)>.*\{\s*B\s+(\d+)\s+(\d+)(?:\s+([\d.]+))?\s+C\s*\}"
 )

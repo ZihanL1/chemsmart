@@ -373,7 +373,8 @@ class Thermochemistry:
     def _calculate_rotational_partition_function_for_nonlinear_polyatomic_molecule(
         self,
     ):
-        """Calculate the rotational partition function of a nonlinear polyatomic molecule.
+        """Calculate the rotational partition function of a nonlinear
+        polyatomic molecule.
 
         Formula:
             q_r = pi^(1/2) / σ_r * (T^(3/2) / (Θ_r,x * Θ_r,y * Θ_r,z)^(1/2))
@@ -442,7 +443,8 @@ class Thermochemistry:
 
     @property
     def rotational_heat_capacity(self):
-        """Obtain the rotational contribution to the heat capacity in J mol^-1 K^-1.
+        """Obtain the rotational contribution to the heat capacity in J mol^-1
+        K^-1.
 
         Formula:
             C_r = 0 for monoatomic molecules
@@ -553,7 +555,8 @@ class Thermochemistry:
 
     @property
     def vibrational_heat_capacity(self):
-        """Obtain the vibrational contribution to the heat capacity in J mol^-1 K^-1.
+        """Obtain the vibrational contribution to the heat capacity in J mol^-1
+        K^-1.
 
         Formula:
             C_v = R * Σ(exp(-Θ_v,K / T) *
@@ -1343,7 +1346,9 @@ class Thermochemistry:
 
 
 class BoltzmannAverageThermochemistry(Thermochemistry):
-    """Class to compute Boltzmann-averaged thermochemical properties from a list of files."""
+    """Class to compute Boltzmann-averaged thermochemical properties from a
+    list of files.
+    """
 
     def __init__(self, files, energy_type="gibbs", **kwargs):
         super().__init__(
