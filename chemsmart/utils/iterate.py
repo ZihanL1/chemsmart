@@ -89,8 +89,7 @@ link_index = "1"
 # 2. link_index specifies the atom that will form the new bond
 # 3. For skeletons, the atom at link_index is typically replaced/removed
 # 4. For substituents, the atom at link_index bonds to the skeleton
-# 5. skeleton_indices format: "1, 3-10, 15,
-# 20-25" (ranges and individual indices)
+# 5. skeleton_indices format: "1, 3-10, 15, 20-25" (ranges and individual indices)
 """
 
 
@@ -168,7 +167,8 @@ def _parse_index_string(
     if isinstance(value, int):
         if value <= 0:
             raise click.BadParameter(
-                f"{entry_type.capitalize()} entry {idx + 1}: Found invalid index {value} in '{field_name}'. "
+                f"{entry_type.capitalize()} entry {idx + 1}: "
+                f"Found invalid index {value} in '{field_name}'. "
                 f"Index must be positive (1-based).",
                 param_hint="'-f' / '--filename'",
             )
@@ -190,7 +190,8 @@ def _parse_index_string(
             # S2 Check: Validate not empty
             if len(parsed_indices) == 0:
                 raise click.BadParameter(
-                    f"{entry_type.capitalize()} entry {idx + 1}: Found empty list in '{field_name}'. "
+                    f"{entry_type.capitalize()} entry {idx + 1}: "
+                    f"Found empty list in '{field_name}'. "
                     f"At least one index must be provided.",
                     param_hint="'-f' / '--filename'",
                 )
@@ -198,7 +199,8 @@ def _parse_index_string(
             # S2 Check: Validate positive non-zero indices
             if any(i <= 0 for i in parsed_indices):
                 raise click.BadParameter(
-                    f"{entry_type.capitalize()} entry {idx + 1}: Found invalid index <= 0 in '{field_name}'. "
+                    f"{entry_type.capitalize()} entry {idx + 1}: "
+                    f"Found invalid index <= 0 in '{field_name}'. "
                     f"All indices must be positive (1-based). Found: {parsed_indices}",
                     param_hint="'-f' / '--filename'",
                 )
@@ -208,7 +210,8 @@ def _parse_index_string(
         raise
     except Exception:
         raise click.BadParameter(
-            f"{entry_type.capitalize()} entry {idx + 1}: Invalid format '{value}' in '{field_name}'. "
+            f"{entry_type.capitalize()} entry {idx + 1}: "
+            f"Invalid format '{value}' in '{field_name}'. "
             f"Expected integer, comma-separated list, or range (e.g. '1-5').",
             param_hint="'-f' / '--filename'",
         )
@@ -216,7 +219,8 @@ def _parse_index_string(
     # If it's not None, not Int, and not String
     # (or string parsing failed silently elsewhere)
     raise click.BadParameter(
-        f"{entry_type.capitalize()} entry {idx + 1}: '{field_name}' has invalid type {type(value).__name__}.",
+        f"{entry_type.capitalize()} entry {idx + 1}: "
+        f"'{field_name}' has invalid type {type(value).__name__}.",
         param_hint="'-f' / '--filename'",
     )
 
@@ -246,7 +250,8 @@ def validate_config(config: dict, filename: str) -> dict:
     unknown_top_keys = set(config.keys()) - ALLOWED_TOP_LEVEL_KEYS
     if unknown_top_keys:
         raise click.BadParameter(
-            f"Unknown top-level key(s) in configuration: {unknown_top_keys}. "
+            f"Unknown top-level key(s) in configuration: "
+            f"{unknown_top_keys}. "
             f"Allowed keys: {ALLOWED_TOP_LEVEL_KEYS}",
             param_hint="'-f' / '--filename'",
         )
@@ -260,7 +265,8 @@ def validate_config(config: dict, filename: str) -> dict:
             validated_config["skeletons"] = []
         elif not isinstance(skeletons, list):
             raise click.BadParameter(
-                f"'skeletons' must be a list, got {type(skeletons).__name__}",
+                f"'skeletons' must be a list, "
+                f"got {type(skeletons).__name__}",
                 param_hint="'-f' / '--filename'",
             )
         else:
@@ -278,7 +284,8 @@ def validate_config(config: dict, filename: str) -> dict:
             validated_config["substituents"] = []
         elif not isinstance(substituents, list):
             raise click.BadParameter(
-                f"'substituents' must be a list, got {type(substituents).__name__}",
+                f"'substituents' must be a list, "
+                f"got {type(substituents).__name__}",
                 param_hint="'-f' / '--filename'",
             )
         else:
@@ -341,7 +348,8 @@ def _rule_label_syntax(entry: dict, idx: int, entry_type: str, filename: str):
         if not re.match(safe_label_pattern, label):
             raise click.BadParameter(
                 f"{entry_type} entry {idx + 1} label '{label}': "
-                f"Contains invalid characters. Allowed characters: a-z, A-Z, 0-9, _, -, .",
+                f"Contains invalid characters. "
+                f"Allowed characters: a-z, A-Z, 0-9, _, -, .",
                 param_hint=filename,
             )
 
@@ -440,7 +448,8 @@ def _validate_skeleton_entry(entry: dict, idx: int, filename: str) -> dict:
 
     if not isinstance(entry, dict):
         raise click.BadParameter(
-            f"Skeleton entry {idx + 1} must be a dictionary, got {type(entry).__name__}",
+            f"Skeleton entry {idx + 1} must be a dictionary, "
+            f"got {type(entry).__name__}",
             param_hint="'-f' / '--filename'",
         )
 
@@ -504,7 +513,8 @@ def _validate_substituent_entry(entry: dict, idx: int, filename: str) -> dict:
 
     if not isinstance(entry, dict):
         raise click.BadParameter(
-            f"Substituent entry {idx + 1} must be a dictionary, got {type(entry).__name__}",
+            f"Substituent entry {idx + 1} must be a dictionary, "
+            f"got {type(entry).__name__}",
             param_hint="'-f' / '--filename'",
         )
 
