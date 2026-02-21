@@ -871,9 +871,9 @@ class ORCAOutput(ORCAFileMixin):
                         optimized_final_value
                     )
         ## the above result will return a dictionary
-        #storing the optimized parameters:
+        # storing the optimized parameters:
         ## optimized_geometry = { b(h1,o0) : 0.9627,
-        #b(h2,o0) : 0.9627, a(h1,o0, h2) : 103.35 }
+        # b(h2,o0) : 0.9627, a(h1,o0, h2) : 103.35 }
         return optimized_geometry
 
     @cached_property
