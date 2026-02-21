@@ -314,7 +314,8 @@ class TestPyMOLJobs:
         dna_hybrid_visualized_xyz_file,
         pymol_hybrid_visualization_jobrunner,
     ):
-        # verify that custom light colors provided to the job are written to the pml
+        # verify that custom light colors provided
+        # to the job are written to the pml
         group1 = "503-523"
         group2 = "336, 397-412, 414-422"
         group3 = "467-495, 497-500, 502"

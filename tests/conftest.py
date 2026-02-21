@@ -30,7 +30,8 @@ from chemsmart.settings.server import Server
 def chemsmart_templates_config(mocker):
     """
     Point USER_CONFIG_DIR to the local templates directory.
-    This avoids creating a mock directory and instead uses the provided templates.
+    This avoids creating a mock directory
+    and instead uses the provided templates.
     """
     # Locate templates: chemsmart/settings/templates/.chemsmart
     package_root = Path(__file__).resolve().parent.parent
@@ -906,32 +907,37 @@ def orca_inputs_directory(orca_test_directory):
 
 @pytest.fixture()
 def orca_inputs_xyz_directory(orca_inputs_directory):
-    """Returns the absolute path to the orca inputs that specifies xyz files."""
+    """Returns the absolute path to the
+    orca inputs that specifies xyz files."""
     orca_inputs_xyz_directory = os.path.join(orca_inputs_directory, "xyz")
     return os.path.abspath(orca_inputs_xyz_directory)
 
 
 @pytest.fixture()
 def orca_input_nebts_file(orca_inputs_xyz_directory):
-    """Returns the absolute path to the orca input file for NEB with TS optimization."""
+    """Returns the absolute path to the orca
+    input file for NEB with TS optimization."""
     return os.path.join(orca_inputs_xyz_directory, "neb_TS_rot1.inp")
 
 
 @pytest.fixture()
 def orca_input_nebts_reactant_xyz_file(orca_inputs_xyz_directory):
-    """Returns the absolute path to the orca input file for NEB with TS optimization."""
+    """Returns the absolute path to the orca
+    input file for NEB with TS optimization."""
     return os.path.join(orca_inputs_xyz_directory, "R-1a_opt.xyz")
 
 
 @pytest.fixture()
 def orca_input_nebts_product_xyz_file(orca_inputs_xyz_directory):
-    """Returns the absolute path to the orca input file for NEB with TS optimization."""
+    """Returns the absolute path to the orca
+    input file for NEB with TS optimization."""
     return os.path.join(orca_inputs_xyz_directory, "S-1a_opt.xyz")
 
 
 @pytest.fixture()
 def orca_input_nebts_ts_xyz_file(orca_inputs_xyz_directory):
-    """Returns the absolute path to the orca input file for NEB with TS optimization."""
+    """Returns the absolute path to the orca
+    input file for NEB with TS optimization."""
     return os.path.join(orca_inputs_xyz_directory, "TS_rot1.xyz")
 
 
@@ -1732,19 +1738,22 @@ def iterate_configs_directory(iterate_test_directory):
 
 @pytest.fixture()
 def iterate_integration_config_file(iterate_configs_directory):
-    """Returns the absolute path to tests/data/IterateTests/configs/integration_iterate.toml."""
+    """Returns the absolute path to
+    tests/data/IterateTests/configs/integration_iterate.toml."""
     return os.path.join(iterate_configs_directory, "integration_iterate.toml")
 
 
 @pytest.fixture()
 def iterate_timeout_config_file(iterate_configs_directory):
-    """Returns the absolute path to tests/data/IterateTests/configs/timeout_iterate.toml."""
+    """Returns the absolute path to
+    tests/data/IterateTests/configs/timeout_iterate.toml."""
     return os.path.join(iterate_configs_directory, "timeout_iterate.toml")
 
 
 @pytest.fixture()
 def iterate_template_file(iterate_configs_directory):
-    """Returns the absolute path to tests/data/IterateTests/configs/iterate_template.toml."""
+    """Returns the absolute path to
+    tests/data/IterateTests/configs/iterate_template.toml."""
     return os.path.join(iterate_configs_directory, "iterate_template.toml")
 
 

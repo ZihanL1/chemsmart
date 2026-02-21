@@ -12,7 +12,8 @@ from chemsmart.utils.repattern import (
 
 
 def test_gaussian_opt_keywords_pattern():
-    """Test pattern for matching optimization keywords in Gaussian route strings."""
+    """Test pattern for matching optimization
+    keywords in Gaussian route strings."""
     pattern = re.compile(gaussian_opt_keywords_pattern, re.IGNORECASE)
 
     # Test basic opt keyword
@@ -34,7 +35,8 @@ def test_gaussian_opt_keywords_pattern():
 
 
 def test_gaussian_freq_keywords_pattern():
-    """Test pattern for matching frequency keywords in Gaussian route strings."""
+    """Test pattern for matching frequency
+    keywords in Gaussian route strings."""
     pattern = re.compile(gaussian_freq_keywords_pattern, re.IGNORECASE)
 
     # Test basic freq keyword
@@ -163,7 +165,8 @@ class TestGaussianDiasRegexPatterns:
         ), "Should not match: NiRRBenz_c2_scan_p16_ts_dias_p1_f2.log"
 
     def test_point_without_fragment_excludes_reactant(self):
-        """Test that pattern correctly excludes reactant files containing _r1 or _r2."""
+        """Test that pattern correctly excludes
+        reactant files containing _r1 or _r2."""
         pattern = re.compile(
             gaussian_dias_filename_point_without_fragment_without_reactant
         )

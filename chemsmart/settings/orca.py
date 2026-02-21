@@ -18,7 +18,8 @@ project_settings_registry: list[str] = []
 # Type annotation required for Python's type checker (e.g., mypy)
 # which has stricter requirements when working in contexts where type inference
 # is insufficient or ambiguous.
-# This is not due to Python 3.9 itself, but type checking rules enforced by tools
+# This is not due to Python 3.9 itself,
+# but type checking rules enforced by tools
 # like mypy or stricter typing practices.
 
 
@@ -50,7 +51,8 @@ class ORCAProjectSettings(RegistryMixin):
         for all other job types. Includes functional and basis set assignments.
 
         Returns:
-            ORCAJobSettings: Default ORCA job settings with functional and basis set.
+            ORCAJobSettings: Default ORCA job
+            settings with functional and basis set.
         """
         default_orca_job_settings = ORCAJobSettings.default()
         default_orca_job_settings.functional = self.functional
@@ -93,7 +95,8 @@ class ORCAProjectSettings(RegistryMixin):
         specialized TS optimization algorithms in ORCA.
 
         Returns:
-            ORCATSJobSettings: Settings configured for transition state optimization.
+            ORCATSJobSettings: Settings configured
+            for transition state optimization.
         """
         settings = self.main_settings().copy()
         settings = ORCATSJobSettings(
@@ -107,7 +110,8 @@ class ORCAProjectSettings(RegistryMixin):
         ORCA settings for intrinsic reaction coordinate calculations.
 
         Creates settings for IRC calculations that trace reaction pathways
-        from transition states to reactants and products. Frequency calculations
+        from transition states to reactants
+        and products. Frequency calculations
         are disabled by default for IRC jobs.
 
         Returns:
@@ -130,7 +134,8 @@ class ORCAProjectSettings(RegistryMixin):
         calculations are disabled by default.
 
         Returns:
-            ORCAJobSettings: Settings configured for coordinate scan calculations.
+            ORCAJobSettings: Settings configured
+            for coordinate scan calculations.
         """
         settings = self.main_settings().copy()
         settings.jobtype = "scan"
@@ -141,7 +146,8 @@ class ORCAProjectSettings(RegistryMixin):
         """
         ORCA settings for non-covalent interaction analysis.
 
-        Creates settings for NCI (Non-Covalent Interaction) analysis calculations
+        Creates settings for NCI (Non-Covalent
+        Interaction) analysis calculations
         that identify and characterize weak intermolecular interactions.
         Frequency calculations are disabled by default.
 
@@ -173,7 +179,8 @@ class ORCAProjectSettings(RegistryMixin):
         """
         ORCA settings for single point energy calculations.
 
-        Creates settings for single point calculations at higher level of theory
+        Creates settings for single point
+        calculations at higher level of theory
         using large basis set. Frequency calculations are disabled and the
         large basis set is used for improved accuracy.
 
@@ -207,7 +214,8 @@ class ORCAProjectSettings(RegistryMixin):
             project (str): Name of the project to load settings for.
 
         Returns:
-            YamlORCAProjectSettings: Configured YAML-based project settings instance.
+            YamlORCAProjectSettings: Configured
+            YAML-based project settings instance.
 
         Raises:
             FileNotFoundError: If no project settings are found for the
@@ -236,14 +244,16 @@ class ORCAProjectSettings(RegistryMixin):
         """
         Load project settings using a project manager.
 
-        Internal method for loading project settings through a manager instance.
+        Internal method for loading project
+        settings through a manager instance.
         Handles exceptions and provides error logging for failed operations.
 
         Args:
             manager: Project settings manager instance.
 
         Returns:
-            YamlORCAProjectSettings or None: YAML-based loaded settings or None if loading fails.
+            YamlORCAProjectSettings or None: YAML-based
+            loaded settings or None if loading fails.
         """
         try:
             return manager.create()
@@ -262,7 +272,8 @@ class ORCAProjectSettings(RegistryMixin):
             project_name (str): Name of the project to load.
 
         Returns:
-            YamlORCAProjectSettings or None: YAML-based loaded settings or None if not found.
+            YamlORCAProjectSettings or None: YAML-based
+            loaded settings or None if not found.
         """
         project_name_yaml_path = os.path.join(
             ChemsmartUserSettings().user_orca_settings_dir,
@@ -288,7 +299,8 @@ class ORCAProjectSettings(RegistryMixin):
             project_name (str): Name of the test project to load.
 
         Returns:
-            YamlORCAProjectSettings or None: YAML-based loaded settings or None if not found.
+            YamlORCAProjectSettings or None: YAML-based
+            loaded settings or None if not found.
         """
         current_file_dir = os.path.dirname(os.path.abspath(__file__))
         test_projects_dir = os.path.join(
@@ -557,9 +569,12 @@ class YamlORCAProjectSettingsBuilder:
             jobtype (str): Type of job (opt, ts, irc, scan, etc.).
 
         Returns:
-            ORCAJobSettings or ORCAIRCJobSettings or ORCATSJobSettings: Configured
-                settings for the specified job type. Returns ORCAIRCJobSettings for
-                IRC jobs, ORCATSJobSettings for TS jobs, and ORCAJobSettings for
+            ORCAJobSettings or ORCAIRCJobSettings
+            or ORCATSJobSettings: Configured
+                settings for the specified job
+                type. Returns ORCAIRCJobSettings for
+                IRC jobs, ORCATSJobSettings for
+                TS jobs, and ORCAJobSettings for
                 all other job types.
 
         Raises:

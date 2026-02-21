@@ -64,7 +64,8 @@ def test_iterate_integration_workflow(
         ), "Output file was not generated"
 
         # Compare generated output with expected output
-        # Semantic comparison (atoms and coordinates) is preferred over byte-comparison
+        # Semantic comparison (atoms and coordinates)
+        # is preferred over byte-comparison
         # to robustly handle floating point formatting differences in XYZ files
         from chemsmart.io.xyz.xyzfile import XYZFile
 
@@ -157,7 +158,8 @@ def test_iterate_timeout(
 ):
     """
     Test that the timeout mechanism works correctly.
-    We set a very short timeout (e.g. 0.001s) which should cause the worker to fail due to timeout.
+    We set a very short timeout (e.g. 0.001s) which
+    should cause the worker to fail due to timeout.
     """
     import logging
 
@@ -199,7 +201,8 @@ def test_iterate_timeout(
 
         # 5. Verify results
         # Check logs for timeout warning
-        # Expected log from runner.py: "Timeout ({timeout}s) for combination: {label}"
+        # Expected log from runner.py: "Timeout
+        # ({timeout}s) for combination: {label}"
 
         # We need to construct the label to search for
         # Carbene1_34_OTf_8
@@ -221,7 +224,8 @@ def test_iterate_timeout(
 
 def test_iterate_template_generation(tmpdir, iterate_template_file):
     """
-    Test that the iterate configuration template is generated correctly and matches the golden copy.
+    Test that the iterate configuration template is
+    generated correctly and matches the golden copy.
     """
     from chemsmart.utils.iterate import generate_template
 
@@ -258,7 +262,8 @@ def test_iterate_validation_fails_on_invalid_link_index(
     iterate_invalid_skeleton_link_index_config_file,
 ):
     """
-    Test that the validation logic correctly identifies when a link_index is not
+    Test that the validation logic correctly
+    identifies when a link_index is not
     included in skeleton_indices.
     """
     from click.testing import CliRunner
@@ -285,7 +290,8 @@ def test_iterate_validation_fails_on_invalid_link_index(
 
 def test_iterate_validation_failures_comprehensive(tmpdir):
     """
-    Test various validation failure scenarios using dynamically generated configs.
+    Test various validation failure scenarios
+    using dynamically generated configs.
     Covers missing required fields and forbidden keys.
     """
     from click.testing import CliRunner
@@ -426,7 +432,8 @@ def test_iterate_validation_failures_comprehensive(tmpdir):
             ["Multiple values found in 'link_index'", "exactly one link atom"],
             "Substituent multiple link_index",
         ),
-        # Case 11: Skeleton label with invalid characters (S4 Check: Safe Label)
+        # Case 11: Skeleton label with invalid
+        # characters (S4 Check: Safe Label)
         (
             """
             [[skeletons]]
@@ -437,7 +444,8 @@ def test_iterate_validation_failures_comprehensive(tmpdir):
             ["Contains invalid characters", "Allowed characters"],
             "Skeleton label unsafe characters",
         ),
-        # Case 12: Substituent label with invalid characters (S4 Check: Safe Label)
+        # Case 12: Substituent label with invalid
+        # characters (S4 Check: Safe Label)
         (
             """
             [[skeletons]]
@@ -491,7 +499,8 @@ def test_iterate_validation_failures_comprehensive(tmpdir):
 
 def test_iterate_runner_bounds_validation(tmpdir, fake_iterate_jobrunner):
     """
-    Test that IterateJobRunner correctly validates indices against molecule size.
+    Test that IterateJobRunner correctly
+    validates indices against molecule size.
     (S2) Check: indices > num_atoms checking LOGS, not exceptions.
     """
     from unittest.mock import MagicMock, patch
@@ -580,7 +589,8 @@ def test_iterate_cli_pipeline_success(
     1. Run 'chemsmart iterate -f config.toml'
     2. Verify success exit code
     3. Verify output file exists and matches expected content.
-    This ensures that the CLI entry point correctly orchestrates the job runner.
+    This ensures that the CLI entry point
+    correctly orchestrates the job runner.
     """
 
     from click.testing import CliRunner
@@ -632,8 +642,10 @@ def test_iterate_cli_pipeline_success(
         with open(output_xyz_path, "r") as f_out:
             generated_content = f_out.read().strip()
 
-        # Basic check: Ensuring specific label presence which confirms combination logic ran
-        # The runner combines skeleton label, link index, sub label, and link index.
+        # Basic check: Ensuring specific label
+        # presence which confirms combination logic ran
+        # The runner combines skeleton label,
+        # link index, sub label, and link index.
         # e.g. Carbene1 + 8 + OTf + 8 -> Carbene1_8_OTf_8
         assert "Carbene1_8_OTf_8" in generated_content
 

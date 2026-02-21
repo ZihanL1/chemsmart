@@ -46,7 +46,8 @@ class IterateCombination:
         """
         Generate a unique label for this combination.
 
-        Format: {skeleton_label}_{skeleton_link_index}_{substituent_label}_{substituent_link_index}
+        Format: {skeleton_label}_{skeleton_link_index}
+        _{substituent_label}_{substituent_link_index}
         Example: benzene_5_methyl_1
         """
         return f"{self.skeleton_label}_{self.skeleton_link_index}_{self.substituent_label}_{self.substituent_link_index}"
@@ -259,7 +260,8 @@ class IterateJobRunner(JobRunner):
             # State tracking
             pending_combinations = deque(combinations)
             # process_id -> (process, combination, start_time)
-            # Use id(p) instead of p.pid as key to avoid potential None pid issues
+            # Use id(p) instead of p.pid as key
+            # to avoid potential None pid issues
             active_processes: dict[
                 int, tuple[multiprocessing.Process, IterateCombination, float]
             ] = {}
@@ -297,7 +299,8 @@ class IterateJobRunner(JobRunner):
                 for proc_id, (p, comb, start_time) in active_processes.items():
                     if not p.is_alive():
                         # Process finished naturally (or crashed).
-                        # Result should be in queue (handled above or next loop before exit)
+                        # Result should be in queue (handled
+                        # above or next loop before exit)
                         p.join()
                         pids_to_remove.append(proc_id)
                     else:
@@ -442,11 +445,13 @@ class IterateJobRunner(JobRunner):
 
             # Validate link_index
             link_indices = mol_config.get("link_index")
-            # Ensure it is a list if not None (normalized in CLI, but for safety in runner)
+            # Ensure it is a list if not None (normalized
+            # in CLI, but for safety in runner)
             if link_indices is not None and not isinstance(link_indices, list):
                 if isinstance(link_indices, int):
                     link_indices = [link_indices]
-                # If string or other, it should have been caught by CLI, but we assume it might be raw here if skipped CLI
+                # If string or other, it should have been caught by
+                # CLI, but we assume it might be raw here if skipped CLI
 
             if link_indices:
                 invalid_links = [i for i in link_indices if i > num_atoms]
@@ -485,7 +490,8 @@ class IterateJobRunner(JobRunner):
         self, job: "IterateJob"
     ) -> list[IterateCombination]:
         """
-        Generate all combinations of (skeleton, skeleton_link_index, substituent).
+        Generate all combinations of (skeleton,
+        skeleton_link_index, substituent).
 
         Parameters
         ----------

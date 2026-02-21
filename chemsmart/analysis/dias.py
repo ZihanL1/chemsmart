@@ -229,7 +229,8 @@ class DIASOutputFolder(BaseFolder):
                 # ref file is given, zero ref wrt to the ref file given
                 lowest_rel_tot_e = self.ref_file_rel_energy
         else:
-            # no zeroing reference, plot as given (whether ref file is given or not)
+            # no zeroing reference, plot as given
+            # (whether ref file is given or not)
             lowest_rel_tot_e = 0.0
         rel_total_energies = [
             i - lowest_rel_tot_e for i in self.list_rel_total_energies
