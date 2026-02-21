@@ -4,11 +4,9 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
 # -- Project information -----------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/
-# configuration.html#project-information
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 # -- Project information -----------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/
-# configuration.html#project-information
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 # docs/source/conf.py
 from __future__ import annotations
 
@@ -25,8 +23,7 @@ copyright = f"{datetime.now():%Y}, {author}"
 release = "0.3.0"
 
 # -- General configuration ---------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/
-# configuration.html#general-configuration
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
     "myst_parser",  # Markdown support
@@ -69,8 +66,7 @@ templates_path = ["_templates"]  # create or remove
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # -- Options for HTML output -------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/
-# configuration.html#options-for-html-output
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "sphinx_rtd_theme"  # matches your requirements.txt
 html_static_path = ["_static"]  # create or remove
