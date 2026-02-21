@@ -129,7 +129,6 @@ class TestGaussianQMMMJobSettings:
             parent_jobtype="opt",
             freq=True,
         )
-        print(settings1.route_string)
         assert settings1.route_string == "# opt freq oniom(b3lyp/6-31g(d):uff)"
 
         settings2 = GaussianQMMMJobSettings(

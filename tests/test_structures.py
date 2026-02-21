@@ -1021,8 +1021,7 @@ class TestChemicalFeatures:
         )
 
         # can't get the bond orders of this challenging molecule correctly
-        # bond_orders =
-        # chiral_mol.get_bond_orders_from_rdkit_mol(bond_cutoff_buffer=-0.4)
+        # bond_orders = chiral_mol.get_bond_orders_from_rdkit_mol(bond_cutoff_buffer=-0.4)
         # print(bond_orders)
         assert chiral_mol.is_chiral
 
