@@ -171,6 +171,7 @@ def read_molecular_job_yaml(filename, program="gaussian"):
         "traj",
         "uvvis",
         "wbi",
+        "neb",  # NEB uses gas settings, with NEB-specific options from CLI
     ]
     sp_job = ["sp"]
     td_job = ["td"]
