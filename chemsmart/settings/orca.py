@@ -482,12 +482,12 @@ class YamlORCAProjectSettings(ORCAProjectSettings):
             ORCANEBJobSettings: Pre-configured NEB calculation settings.
         """
         if self._neb_settings is None:
-            import copy
+            from copy import deepcopy
 
             from chemsmart.jobs.orca.settings import ORCANEBJobSettings
 
             # Fall back to opt settings when no NEB section is provided
-            base_opt = copy.deepcopy(self._opt_settings)
+            base_opt = deepcopy(self._opt_settings)
             self._neb_settings = ORCANEBJobSettings(**base_opt.__dict__)
         return self._neb_settings
 

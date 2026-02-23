@@ -167,7 +167,7 @@ NEB Options
       -  flag
       -  Pre-optimize endpoint geometries before NEB calculation. [default: False]
 
-   -  -  ``-a, --semiempirical``
+   -  -  ``-s, --semiempirical``
       -  choice
       -  Semiempirical method for NEB calculation: XTB0, XTB1, XTB2
 
@@ -182,13 +182,13 @@ Standard NEB calculation:
 
 .. code:: bash
 
-   chemsmart sub orca -p project -f reactant.xyz -c 0 -m 1 neb -j NEB-TS -e product.xyz -a XTB2
+   chemsmart sub orca -p project -f reactant.xyz -c 0 -m 1 neb -j NEB-TS -e product.xyz -s XTB2
 
 NEB with climbing image:
 
 .. code:: bash
 
-   chemsmart sub orca -p project -f reactant.xyz -c 0 -m 1 neb -j NEB-CI -e product.xyz -a XTB1
+   chemsmart sub orca -p project -f reactant.xyz -c 0 -m 1 neb -j NEB-CI -e product.xyz -s XTB1
 
 NEB with intermediate guess:
 
@@ -206,7 +206,7 @@ NEB with geometry pre-optimization:
 
 .. code:: bash
 
-   chemsmart sub orca -p project -f reactant.xyz -c 0 -m 1 neb -j NEB-TS -e product.xyz -o -a XTB2
+   chemsmart sub orca -p project -f reactant.xyz -c 0 -m 1 neb -j NEB-TS -e product.xyz -o -s XTB2
 
 Advanced Usage
 ==============
@@ -215,28 +215,28 @@ With custom number of images:
 
 .. code:: bash
 
-   chemsmart sub orca -p project -f reactant.xyz -c 0 -m 1 neb -j NEB-CI -e product.xyz -n 16 -a XTB2
+   chemsmart sub orca -p project -f reactant.xyz -c 0 -m 1 neb -j NEB-CI -e product.xyz -n 16 -s XTB2
 
 Using absolute paths for geometry files:
 
 .. code:: bash
 
    chemsmart sub orca -p project -f /path/to/reactant.xyz -c 0 -m 2 neb \
-     -j NEB-CI -n 16 -e /path/to/product.xyz -o -a xtb0
+     -j NEB-CI -n 16 -e /path/to/product.xyz -o -s xtb0
 
 With intermediate TS guess and pre-optimization:
 
 .. code:: bash
 
    chemsmart sub orca -p project -f reactant.xyz -c 0 -m 1 neb \
-     -j NEB-TS -e product.xyz -i ts_initial_guess.xyz -o -a XTB2 -n 12
+     -j NEB-TS -e product.xyz -i ts_initial_guess.xyz -o -s XTB2 -n 12
 
 Running on specific server with scratch:
 
 .. code:: bash
 
    chemsmart sub -s my_server orca -p project -f reactant.xyz -c 0 -m 1 neb \
-     -j NEB-CI -e product.xyz -a XTB1
+     -j NEB-CI -e product.xyz -s XTB1
 
 Job Types
 =========
