@@ -3300,17 +3300,23 @@ class ORCANEBFile(ORCAOutput):
 
     @property
     def ci(self):
-        ci, _, _ = self._get_ci_infor()
+        ci, _, _ = self._get_ci_info()
+        if ci is None:
+            return None
         return f"Climbing Image:  image {ci}."
 
     @property
     def ci_energy(self):
-        _, ci_energy, _ = self._get_ci_infor()
+        _, ci_energy, _ = self._get_ci_info()
+        if ci_energy is None:
+            return None
         return ci_energy
 
     @property
     def ci_max_abs_force(self):
-        _, _, ci_max_abs_force = self._get_ci_infor()
+        _, _, ci_max_abs_force = self._get_ci_info()
+        if ci_max_abs_force is None:
+            return None
         return ci_max_abs_force
 
     @property
@@ -3353,7 +3359,7 @@ class ORCANEBFile(ORCAOutput):
     def preopt_ends(self):
         return self._get_pre_optimization()
 
-    def _get_ci_infor(self):
+    def _get_ci_info(self):
         ci = ci_energy = ci_max_abs_force = None
         for i, line in enumerate(self.contents):
             if "Climbing image                            ...." in line:
