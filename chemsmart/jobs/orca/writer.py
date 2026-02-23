@@ -650,6 +650,61 @@ class ORCAInputWriter(InputWriter):
                 f.write(f"  {key} {value}\n")
         f.write("end\n")
 
+    @property
+    def neb_block(self):
+        """
+        Generate ORCA NEB input block as a string.
+
+        This property is for testing and inspection. Actual file writing
+        is handled by _write_neb_block_for_neb().
+
+        Returns:
+            str: Formatted %NEB block for ORCA input file
+
+        Raises:
+            AssertionError: If nimages is not set or geometry files are missing
+
+        Example output:
+            %NEB
+            NEB_END_XYZFILE "product.xyz"
+            NEB_TS_XYZFILE "ts_guess.xyz"
+            NImages 8
+            PREOPT_ENDS True
+            end
+        """
+        settings = self.settings
+
+        # Validate required settings
+        assert settings.nimages, "The number of images is missing!"
+        assert (
+            settings.restarting_xyzfile or settings.ending_xyzfile
+        ), "No valid input geometry is given!"
+
+        lines = ["%NEB"]
+
+        if settings.restarting_xyzfile:
+            restart_file = os.path.basename(settings.restarting_xyzfile)
+            lines.append(f'Restart_ALLXYZFile "{restart_file}"')
+        else:
+            assert settings.ending_xyzfile, "No end geometry file is given!"
+            ending_file = os.path.basename(settings.ending_xyzfile)
+            lines.append(f'NEB_END_XYZFILE "{ending_file}"')
+
+            if settings.intermediate_xyzfile:
+                intermediate_file = os.path.basename(
+                    settings.intermediate_xyzfile
+                )
+                lines.append(f'NEB_TS_XYZFILE "{intermediate_file}"')
+
+        lines.append(f"NImages {settings.nimages}")
+
+        if not settings.restarting_xyzfile:
+            bool_str = "True" if settings.preopt_ends else "False"
+            lines.append(f"PREOPT_ENDS {bool_str}")
+
+        lines.append("end")
+        return "\n".join(lines)
+
     def _write_neb_block_for_neb(self, f):
         """
         Write ORCA NEB block configuration to input file.

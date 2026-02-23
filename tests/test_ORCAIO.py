@@ -17,6 +17,7 @@ from chemsmart.io.orca.output import (
 )
 from chemsmart.io.orca.route import ORCARoute
 from chemsmart.jobs.orca.settings import ORCANEBJobSettings
+from chemsmart.jobs.orca.writer import ORCAInputWriter
 
 
 class TestORCARoute:
@@ -2945,15 +2946,22 @@ class TestORCANEBJobSettings:
         settings = ORCANEBJobSettings(joboption="NEB-CI", semiempirical="XTB2")
         assert settings.route_string == "!  XTB2 NEB-CI"
 
-    def test_neb_block_basic(self):
-        """Test basic NEB block generation."""
+    def test_neb_block_basic(self, tmpdir):
+        """Test basic NEB block generation via ORCAInputWriter."""
+        from unittest.mock import MagicMock
+
         settings = ORCANEBJobSettings(
             nimages=5, starting_xyz="start.xyz", ending_xyzfile="end.xyz"
         )
-        neb_block = settings.neb_block
-        assert "%neb" in neb_block
+        # Create a mock job with the settings
+        mock_job = MagicMock()
+        mock_job.settings = settings
+
+        writer = ORCAInputWriter(job=mock_job)
+        neb_block = writer.neb_block
+        assert "%NEB" in neb_block
         assert "NImages 5" in neb_block
-        assert 'NEB_END_XYZFile "end.xyz"' in neb_block
+        assert 'NEB_END_XYZFILE "end.xyz"' in neb_block
 
     def test_inheritance(self):
         """Test inheritance from ORCAJobSettings."""
@@ -2964,11 +2972,17 @@ class TestORCANEBJobSettings:
 
     def test_validation_errors(self):
         """Test validation raises appropriate errors."""
+        from unittest.mock import MagicMock
+
         settings = ORCANEBJobSettings(starting_xyz="start.xyz")
+        mock_job = MagicMock()
+        mock_job.settings = settings
+        writer = ORCAInputWriter(job=mock_job)
+
         with pytest.raises(
             AssertionError, match="The number of images is missing"
         ):
-            _ = settings.neb_block
+            _ = writer.neb_block
 
     def test_equality_identical_settings(self):
         """Test that identical NEB settings are equal."""
