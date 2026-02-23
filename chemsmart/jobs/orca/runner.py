@@ -138,6 +138,9 @@ class ORCAJobRunner(JobRunner):
             job: The job object to prepare for execution
         """
         self._assign_variables(job)
+        if self.scratch and os.path.exists(job.inputfile):
+            # copy input file to scratch directory
+            self._copy_over_xyz_files(job)
 
     def _assign_variables(self, job):
         """
@@ -297,11 +300,6 @@ class ORCAJobRunner(JobRunner):
 
         input_writer = ORCAInputWriter(job=job)
         input_writer.write(target_directory=self.running_directory)
-
-        # Copy XYZ files to scratch after writing input file
-        # Use the actual input file path (self.job_inputfile in scratch)
-        if self.scratch and os.path.exists(self.job_inputfile):
-            self._copy_over_xyz_files(job)
 
     def _get_command(self, job):
         """
