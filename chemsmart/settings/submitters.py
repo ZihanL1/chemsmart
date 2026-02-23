@@ -95,10 +95,12 @@ class Submitter(RegistryMixin):
 
     Attributes:
         NAME (str): Class-level identifier for the submitter type.
-        name (str): Instance identifier for this submitter (often same as NAME).
+        name (str): Instance identifier for
+        this submitter (often same as NAME).
         job (Job): Job instance to be submitted.
         server (Server): Server configuration used for submission.
-        kwargs (dict): Additional submission parameters passed through to subclasses.
+        kwargs (dict): Additional submission
+        parameters passed through to subclasses.
     """
 
     NAME: Optional[str] = None
@@ -248,7 +250,8 @@ class Submitter(RegistryMixin):
             executable = NCIPLOTExecutable.from_servername(self.server.name)
 
         else:
-            # Need to add programs here to be supported for other types of programs
+            # Need to add programs here to be
+            # supported for other types of programs
             raise ValueError(f"Program {self.job.PROGRAM} not supported.")
         return executable
 
@@ -477,7 +480,8 @@ class Submitter(RegistryMixin):
             (e.g., job and server).
 
         Raises:
-            ValueError: If no submitter is found for the specified scheduler type.
+            ValueError: If no submitter is found
+            for the specified scheduler type.
         """
         submitters = cls.subclasses()
         for submitter in submitters:
@@ -501,7 +505,8 @@ class PBSSubmitter(Submitter):
         name (str): Inherited; instance identifier (often 'PBS').
         job (Job): Job instance to be submitted.
         server (Server): Server configuration used for submission.
-        kwargs (dict): Additional submission parameters passed to the base class.
+        kwargs (dict): Additional submission
+        parameters passed to the base class.
     """
 
     NAME = "PBS"
@@ -576,7 +581,8 @@ class SLURMSubmitter(Submitter):
         name (str): Inherited; instance identifier (often 'SLURM').
         job (Job): Job instance to be submitted.
         server (Server): Server configuration used for submission.
-        kwargs (dict): Additional submission parameters passed to the base class.
+        kwargs (dict): Additional submission
+        parameters passed to the base class.
     """
 
     NAME = "SLURM"
@@ -586,7 +592,8 @@ class SLURMSubmitter(Submitter):
         Initialize SLURM submitter.
 
         Args:
-            name (str): Name identifier for this submitter. Defaults to "SLURM".
+            name (str): Name identifier for
+            this submitter. Defaults to "SLURM".
             job: Job instance to be submitted.
             server: Server configuration for SLURM submission.
             **kwargs: Additional submission parameters.
@@ -653,7 +660,8 @@ class SLFSubmitter(Submitter):
         name (str): Inherited; instance identifier (often 'SLF').
         job (Job): Job instance to be submitted.
         server (Server): Server configuration used for submission.
-        kwargs (dict): Additional submission parameters passed to the base class.
+        kwargs (dict): Additional submission
+        parameters passed to the base class.
     """
 
     NAME = "SLF"
@@ -722,7 +730,8 @@ class FUGAKUSubmitter(Submitter):
         name (str): Inherited; instance identifier (often 'FUGAKU').
         job (Job): Job instance to be submitted.
         server (Server): Server configuration used for submission.
-        kwargs (dict): Additional submission parameters passed to the base class.
+        kwargs (dict): Additional submission
+        parameters passed to the base class.
     """
 
     NAME = "FUGAKU"
@@ -732,7 +741,8 @@ class FUGAKUSubmitter(Submitter):
         Initialize FUGAKU submitter.
 
         Args:
-            name (str): Name identifier for this submitter. Defaults to "FUGAKU".
+            name (str): Name identifier for this
+            submitter. Defaults to "FUGAKU".
             job: Job instance to be submitted.
             server: Server configuration for FUGAKU submission.
             **kwargs: Additional submission parameters.

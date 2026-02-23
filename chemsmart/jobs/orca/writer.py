@@ -34,7 +34,8 @@ class ORCAInputWriter(InputWriter):
 
     Attributes:
         job (ORCAJob): Target job for which the input is generated.
-        settings (ORCAJobSettings): Settings used to generate the route and blocks.
+        settings (ORCAJobSettings): Settings
+        used to generate the route and blocks.
         jobrunner (ORCAJobRunner): Runner providing cores/memory and paths.
     """
 
@@ -228,7 +229,8 @@ class ORCAInputWriter(InputWriter):
             %cpcm, %cosmo, or %smd blocks that cannot be captured by route.
         """
         # to implement if there is more complex solvents to be specified via
-        # %cpcm block, %cosmo block, or %smd block that cannot be capture by route
+        # %cpcm block, %cosmo block, or %smd
+        # block that cannot be capture by route
         pass
 
     def _write_mdci_block(self, f):
@@ -246,7 +248,8 @@ class ORCAInputWriter(InputWriter):
 
         if mdci_cutoff is not None:
             logger.debug("Writing MDCI block")
-            # check that mdci_cutoff is one of the allowed values: ["loose", "normal", "tight"]
+            # check that mdci_cutoff is one of the
+            # allowed values: ["loose", "normal", "tight"]
             assert mdci_cutoff.lower() in ["loose", "normal", "tight"], (
                 "mdci_cutoff must be one of the allowed values: "
                 "['loose', 'normal', 'tight']"
@@ -269,7 +272,8 @@ class ORCAInputWriter(InputWriter):
                 f.write("  TCutMKN 1e-4\n")
 
             if mdci_density is not None:
-                # check that mdci_density is one of the allowed values: ["none", "unrelaxed", "relaxed"]
+                # check that mdci_density is one of the allowed
+                # values: ["none", "unrelaxed", "relaxed"]
                 assert mdci_density.lower() in [
                     "none",
                     "unrelaxed",
@@ -360,7 +364,8 @@ class ORCAInputWriter(InputWriter):
         """
         f.write("  Constraints\n")
         # append for modred jobs
-        # 'self.modred' as list of lists, or a single list if only one fixed constraint
+        # 'self.modred' as list of lists, or a
+        # single list if only one fixed constraint
         prepend_string_list = get_prepend_string_list_from_modred_free_format(
             input_modred=modred, program="orca"
         )
@@ -465,8 +470,10 @@ class ORCAInputWriter(InputWriter):
                 f'  InHessName "{self.settings.inhess_filename}"  # Hessian file\n'
             )
 
-        """Hybrid Hessian for speed up of TS search: TS mode is complicated and delocalized, 
-        e.g. in a concerted proton transfer reaction, can use hybrid Hessian to calc 
+        """Hybrid Hessian for speed up of TS search:
+        TS mode is complicated and delocalized,
+        e.g. in a concerted proton transfer
+        reaction, can use hybrid Hessian to calc
         numerical second derivatives only for atoms involved in the TS mode"""
         if self.settings.hybrid_hess:
             assert (
@@ -548,35 +555,51 @@ class ORCAInputWriter(InputWriter):
                             # backward
                             # down
         # Initial displacement
-            InitHess   read # by default ORCA uses the Hessian from AnFreq or NumFreq, or computes a new one
-                            # read    - reads the Hessian that is defined via Hess_Filename
+            InitHess read # by default ORCA uses the Hessian
+            from AnFreq or NumFreq, or computes a new one
+                            # read - reads the Hessian that
+                            # is defined via Hess_Filename
                             # calc_anfreq  - computes the analytic Hessian
                             # calc_numfreq - computes the numeric Hessian
-            Hess_Filename "h2o.hess"  # Hessian for initial displacement, must be used together with InitHess = read
-            hessMode   0  # Hessian mode that is used for the initial displacement. Default 0
+            Hess_Filename "h2o.hess" # Hessian for initial
+            displacement, must be used together with InitHess = read
+            hessMode 0 # Hessian mode that is used
+            for the initial displacement. Default 0
             Init_Displ DE      # DE (default) - energy difference
                                # length       - step size
-            Scale_Init_Displ 0.1 # step size for initial displacement from TS. Default 0.1 a.u.
-            DE_Init_Displ    2.0 # energy difference that is expected for initial displacement
+            Scale_Init_Displ 0.1 # step size for initial
+            displacement from TS. Default 0.1 a.u.
+            DE_Init_Displ 2.0 # energy difference
+            that is expected for initial displacement
                                  #  based on provided Hessian (Default: 2 mEh)
         # Steps
             Follow_CoordType cartesian # default and only option
-            Scale_Displ_SD    0.15  # Scaling factor for scaling the 1st SD step
-            Adapt_Scale_Displ true  # modify Scale_Displ_SD when the step size becomes smaller or larger
-            SD_ParabolicFit   true  # Do a parabolic fit for finding an optimal SD step length
-            Interpolate_only  true  # Only allow interpolation for parabolic fit, not extrapolation
+            Scale_Displ_SD 0.15 # Scaling
+            factor for scaling the 1st SD step
+            Adapt_Scale_Displ true # modify Scale_Displ_SD
+            when the step size becomes smaller or larger
+            SD_ParabolicFit true # Do a parabolic
+            fit for finding an optimal SD step length
+            Interpolate_only true # Only allow interpolation
+            for parabolic fit, not extrapolation
             Do_SD_Corr        true  # Apply a correction to the 1st SD step
-            Scale_Displ_SD_Corr  0.333 # Scaling factor for scaling the correction step to the SD step.
-                                       # It is multiplied by the length of the final 1st SD step
-            SD_Corr_ParabolicFit true  # Do a parabolic fit for finding an optimal correction
+            Scale_Displ_SD_Corr 0.333 # Scaling factor for
+            scaling the correction step to the SD step.
+                                       # It is multiplied by the length
+                                       # of the final 1st SD step
+            SD_Corr_ParabolicFit true # Do a parabolic
+            fit for finding an optimal correction
                                        # step length
         # Convergence thresholds - similar to LooseOpt
             TolRMSG   5.e-4      # RMS gradient (a.u.)
             TolMaxG   2.e-3      # Max. element of gradient (a.u.)
         # Output options
-            Monitor_Internals   # Up to three internal coordinates can be defined
-                {B 0 1}         # for which the values are printed during the IRC run.
-                {B 1 5}         # Possible are (B)onds, (A)ngles, (D)ihedrals and (I)mpropers
+            Monitor_Internals # Up to three
+            internal coordinates can be defined
+                {B 0 1} # for which the values
+                are printed during the IRC run.
+                {B 1 5} # Possible are (B)onds,
+                (A)ngles, (D)ihedrals and (I)mpropers
             end
         end.
         """
@@ -795,7 +818,8 @@ class ORCAInputWriter(InputWriter):
         multiplicity = getattr(self.settings, "multiplicity", None)
 
         # If missing, attempt to populate from common QMMM-related fields.
-        # Common names across settings: charge_qm, charge_intermediate, charge_total
+        # Common names across settings: charge_qm,
+        # charge_intermediate, charge_total
         # and mult_qm, mult_intermediate, mult_total.
         if charge is None or multiplicity is None:
             # order of preference: intermediate (QM2) -> qm -> total
