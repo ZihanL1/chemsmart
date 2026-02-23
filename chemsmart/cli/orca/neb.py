@@ -198,7 +198,7 @@ def neb(
             for molecule, idx in zip(molecules, molecule_indices):
                 molecule_label = f"{label}_idx{idx}"
                 logger.info(
-                    f"Running modred for molecule {idx}: {molecule} with label {molecule_label}"
+                    f"Running NEB for molecule {idx}: {molecule} with label {molecule_label}"
                 )
 
                 job = ORCANEBJob(
