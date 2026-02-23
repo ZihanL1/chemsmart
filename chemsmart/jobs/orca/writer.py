@@ -7,7 +7,7 @@ based on job settings and molecular structures.
 """
 
 import logging
-import os.path
+import os
 
 from chemsmart.jobs.orca.settings import (
     ORCAIRCJobSettings,
@@ -655,62 +655,58 @@ class ORCAInputWriter(InputWriter):
         Write ORCA NEB block configuration to input file.
 
         Generates the %NEB block with NEB-specific options including number
-        of images, geometry files, and optimization settings. Only writes
-        the block if NEB-specific settings are present. Uses basenames for
-        file paths to work with scratch directory execution.
+        of images, geometry files, and optimization settings. Uses basenames
+        for file paths to work with scratch directory execution.
 
         Args:
             f: File object to write to
 
         Example output:
             %NEB
-            NIMAGES 8
             NEB_END_XYZFILE "product.xyz"
             NEB_TS_XYZFILE "ts_guess.xyz"
+            NImages 8
             PREOPT_ENDS True
             end
+
+        Raises:
+            AssertionError: If nimages is not set or geometry files are missing
         """
-        import os
+        settings = self.settings
 
-        neb_settings_keys = self.settings.__dict__.keys()
-        from chemsmart.jobs.orca.settings import ORCAJobSettings
+        # Validate required settings
+        assert settings.nimages, "The number of images is missing!"
+        assert (
+            settings.restarting_xyzfile or settings.ending_xyzfile
+        ), "No valid input geometry is given!"
 
-        parent_settings_keys = ORCAJobSettings().__dict__.keys()
-        neb_specific_keys = set(neb_settings_keys) - set(parent_settings_keys)
-
-        if not any(
-            getattr(self.settings, key) is not None
-            for key in neb_specific_keys
-        ):
-            return
-        neb_specific_keys = sorted(neb_specific_keys)
-        # write neb block if any option value is not None:
         f.write("%NEB\n")
 
-        for key in neb_specific_keys:
-            value = getattr(self.settings, key)
-            if value is None:
-                continue
-            if key == "nimages":
-                f.write(f"{key.upper()} {value}\n")
-            if key == "ending_xyzfile":
-                # Use basename for scratch compatibility
-                ending_file = os.path.basename(value)
-                f.write(f'NEB_END_XYZFILE "{ending_file}"\n')
-            if key == "starting_xyz":
-                pass
-            if key == "intermediate_xyzfile":
-                # Use basename for scratch compatibility
-                intermediate_file = os.path.basename(value)
+        if settings.restarting_xyzfile:
+            # Use basename for scratch compatibility
+            restart_file = os.path.basename(settings.restarting_xyzfile)
+            f.write(f'Restart_ALLXYZFile "{restart_file}"\n')
+        else:
+            assert settings.ending_xyzfile, "No end geometry file is given!"
+            # Use basename for scratch compatibility
+            ending_file = os.path.basename(settings.ending_xyzfile)
+            f.write(f'NEB_END_XYZFILE "{ending_file}"\n')
+
+            # Write TS guess file if provided
+            if settings.intermediate_xyzfile:
+                intermediate_file = os.path.basename(
+                    settings.intermediate_xyzfile
+                )
                 f.write(f'NEB_TS_XYZFILE "{intermediate_file}"\n')
-            if key == "restarting_xyzfile":
-                # Use basename for scratch compatibility
-                restart_file = os.path.basename(value)
-                f.write(f'Restart_ALLXYZFile "{restart_file}"\n')
-            if key == "preopt_ends":
-                # Always write explicit boolean to preserve user setting
-                bool_str = "True" if value else "False"
-                f.write(f"PREOPT_ENDS {bool_str}\n")
+
+        # Write number of images
+        f.write(f"NImages {settings.nimages}\n")
+
+        # Write pre-optimization setting (only when not using restart)
+        if not settings.restarting_xyzfile:
+            bool_str = "True" if settings.preopt_ends else "False"
+            f.write(f"PREOPT_ENDS {bool_str}\n")
+
         f.write("end\n")
 
     def _write_constrained_atoms(self, f):

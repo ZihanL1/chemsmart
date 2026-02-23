@@ -64,7 +64,7 @@ logger = logging.getLogger(__name__)
     help="Whether to optimize the input geometries.",
 )
 @click.option(
-    "-a",
+    "-s",
     "--semiempirical",
     type=click.Choice(
         [

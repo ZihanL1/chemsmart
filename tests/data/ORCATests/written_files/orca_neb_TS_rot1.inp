@@ -6,7 +6,7 @@
 %NEB
 NEB_END_XYZFILE "product.xyz"
 NEB_TS_XYZFILE "ts.xyz"
-NIMAGES 5
+NImages 5
 PREOPT_ENDS True
 end
 * xyz 0 1

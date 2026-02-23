@@ -1956,42 +1956,32 @@ class ORCANEBJobSettings(ORCAJobSettings):
     @property
     def neb_block(self):
         """
-        Generate ORCA NEB input block.
+        Generate ORCA NEB input block as a string.
+
+        This property is primarily for testing and inspection. Actual file
+        writing is handled by ORCAInputWriter._write_neb_block_for_neb().
 
         Returns:
             str: Formatted %neb block for ORCA input file
-        """
-        return self._write_neb_block()
-
-    def _write_neb_block(self):
-        """
-        Generate ORCA NEB input block.
-
-        Creates the %neb block with configuration for the NEB calculation
-        including number of images, file paths, and optimization settings.
-
-        Returns:
-            str: Formatted NEB block for ORCA input file
-
-        Example output:
-            %neb
-            NImages 8
-            NEB_END_XYZFILE "product.xyz"
-            PREOPT_ENDS FALSE
-            NEB_TS_XYZFILE "ts_guess.xyz"  # if provided
-            END
 
         Raises:
             AssertionError: If nimages is not set or geometry files are missing
+
+        Example output:
+            %neb
+            NEB_END_XYZFILE "product.xyz"
+            NEB_TS_XYZFILE "ts_guess.xyz"
+            NImages 8
+            PREOPT_ENDS False
+            END
         """
         assert self.nimages, "The number of images is missing!"
-        lines = [
-            "%neb",
-            f"NImages {self.nimages}",
-        ]
         assert self.restarting_xyzfile or (
             self.ending_xyzfile
         ), "No valid input geometry is given!"
+
+        lines = ["%neb"]
+
         if self.restarting_xyzfile:
             # Use basename for scratch compatibility
             restart_file = os.path.basename(self.restarting_xyzfile)
@@ -2001,11 +1991,19 @@ class ORCANEBJobSettings(ORCAJobSettings):
             # Use basename for scratch compatibility
             ending_file = os.path.basename(self.ending_xyzfile)
             lines.append(f'NEB_END_XYZFile "{ending_file}"')
-            bool_str = "True" if self.preopt_ends else "False"
-            lines.append(f"PREOPT_ENDS {bool_str}")
+
+            # Write TS guess file if provided
             if self.intermediate_xyzfile:
-                # Use basename for scratch compatibility
                 intermediate_file = os.path.basename(self.intermediate_xyzfile)
                 lines.append(f'NEB_TS_XYZFILE "{intermediate_file}"')
+
+        # Write number of images
+        lines.append(f"NImages {self.nimages}")
+
+        # Write pre-optimization setting (only when not using restart)
+        if not self.restarting_xyzfile:
+            bool_str = "True" if self.preopt_ends else "False"
+            lines.append(f"PREOPT_ENDS {bool_str}")
+
         lines.append("END")
         return "\n".join(lines)

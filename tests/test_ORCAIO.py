@@ -11,7 +11,7 @@ from chemsmart.io.orca import ORCARefs
 from chemsmart.io.orca.input import ORCAInput, ORCANEBInput, ORCAQMMMInput
 from chemsmart.io.orca.output import (
     ORCAEngradFile,
-    ORCANEBFile,
+    ORCANEBOutput,
     ORCAOutput,
     ORCAQMMMOutput,
 )
@@ -397,7 +397,7 @@ END
         """Test that NEB input parsing is case-insensitive."""
         neb_content = """!XTB2 NEB-TS
 %neb
-  NIMAGES 10
+  NImages 10
   neb_end_xyzfile "PRODUCT.xyz"
   Preopt_Ends false
 end
@@ -2899,7 +2899,7 @@ class TestORCANEB:
         data = src.read_text(encoding="utf-8", errors="replace")
         lines = [ln.strip() for ln in data.splitlines()]
 
-        orca_neb = ORCANEBFile(filename=str(src))
+        orca_neb = ORCANEBOutput(filename=str(src))
         orca_neb.__dict__["contents"] = lines
         orca_neb.__dict__["content_lines_string"] = data
         assert orca_neb.nimages == 10
