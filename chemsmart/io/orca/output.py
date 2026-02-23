@@ -3408,7 +3408,7 @@ class ORCANEBFile(ORCAOutput):
             if "Number of images (incl. end points)" in line:
                 line_elements = line.split()
                 return int(line_elements[-1])
-            return None
+        return None
 
     def _get_pre_optimization(self):
         preopt_ends = False
@@ -3437,4 +3437,4 @@ class ORCANEBFile(ORCAOutput):
                     ts_max_abs_force,
                     ts_rms_force,
                 )
-            return None, None, None, None
+        return None, None, None, None
