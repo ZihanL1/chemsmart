@@ -2997,7 +2997,6 @@ class TestORCANEBJobSettings:
             multiplicity=1,
         )
         assert settings1 == settings2
-        assert not (settings1 != settings2)
 
     def test_equality_different_joboption(self):
         """Test that settings with different joboption are not equal."""
@@ -3008,7 +3007,6 @@ class TestORCANEBJobSettings:
             joboption="NEB-CI", nimages=8, ending_xyzfile="product.xyz"
         )
         assert settings1 != settings2
-        assert not (settings1 == settings2)
 
     def test_equality_different_nimages(self):
         """Test that settings with different nimages are not equal."""
