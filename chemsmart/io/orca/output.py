@@ -3337,22 +3337,22 @@ class ORCANEBFile(ORCAOutput):
 
     @property
     def ts_energy(self):
-        ts_energy, _, _, _ = self._get_ts_infor()
+        ts_energy, _, _, _ = self._get_ts_info()
         return ts_energy
 
     @property
     def ts_delta_energy(self):
-        _, ts_delta_energy, _, _ = self._get_ts_infor()
+        _, ts_delta_energy, _, _ = self._get_ts_info()
         return ts_delta_energy
 
     @property
     def ts_max_abs_force(self):
-        _, _, ts_max_abs_force, _ = self._get_ts_infor()
+        _, _, ts_max_abs_force, _ = self._get_ts_info()
         return ts_max_abs_force
 
     @property
     def ts_rms_force(self):
-        _, _, _, ts_rms_force = self._get_ts_infor()
+        _, _, _, ts_rms_force = self._get_ts_info()
         return ts_rms_force
 
     @property
@@ -3408,6 +3408,7 @@ class ORCANEBFile(ORCAOutput):
             if "Number of images (incl. end points)" in line:
                 line_elements = line.split()
                 return int(line_elements[-1])
+            return None
 
     def _get_pre_optimization(self):
         preopt_ends = False
@@ -3420,7 +3421,7 @@ class ORCANEBFile(ORCAOutput):
                 break
         return preopt_ends
 
-    def _get_ts_infor(self):
+    def _get_ts_info(self):
         for line in self.contents:
             ts_pattern = r"(-?\d+\.\d+)\s+<= TS"
             match = re.findall(ts_pattern, line)
@@ -3436,3 +3437,4 @@ class ORCANEBFile(ORCAOutput):
                     ts_max_abs_force,
                     ts_rms_force,
                 )
+            return None, None, None, None
