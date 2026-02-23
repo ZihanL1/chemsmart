@@ -543,16 +543,23 @@ class ORCANEBInput(ORCAInput):
             restart_allxyzfile
         ) = None
         for line in self.contents:
-            match = re.search(xyz_filename_pattern, line)
-            if "neb_end_xyzfile" in line.lower():
-                neb_end_xyzile = match.group(1)
-            elif "neb_ts_xyzfile" in line.lower():
-                neb_ts_xyzile = match.group(1)
-            elif "restart_allxyzfile" in line.lower():
+            lower_line = line.lower()
+            if "neb_end_xyzfile" in lower_line:
+                match = re.search(xyz_filename_pattern, line)
+                if match:
+                    neb_end_xyzile = match.group(1)
+            elif "neb_ts_xyzfile" in lower_line:
+                match = re.search(xyz_filename_pattern, line)
+                if match:
+                    neb_ts_xyzile = match.group(1)
+            elif "restart_allxyzfile" in lower_line:
                 match = re.search(allxyz_filename_pattern, line)
-                restart_allxyzfile = match.group(1)
+                if match:
+                    restart_allxyzfile = match.group(1)
             elif line.startswith("* xyzfile"):
-                neb_starting_xyz = match.group(1)
+                match = re.search(xyz_filename_pattern, line)
+                if match:
+                    neb_starting_xyz = match.group(1)
             elif self.coordinate_lines:
                 neb_starting_xyz = self.coordinate_lines
         return (
