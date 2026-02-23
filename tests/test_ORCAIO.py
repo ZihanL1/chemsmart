@@ -8,7 +8,7 @@ from ase import units
 
 from chemsmart.io.molecules.structure import CoordinateBlock, Molecule
 from chemsmart.io.orca import ORCARefs
-from chemsmart.io.orca.input import ORCAInput, ORCAQMMMInput
+from chemsmart.io.orca.input import ORCAInput, ORCANEBInput, ORCAQMMMInput
 from chemsmart.io.orca.output import (
     ORCAEngradFile,
     ORCANEBFile,
@@ -299,6 +299,162 @@ class TestORCAInput:
 
         # todo:tests for crystal QMMM
         # orca_inp3 = os.path.join(orca_inputs_directory, "ionic_crystal_qmmm.inp")
+
+
+class TestORCANEBInput:
+    """Test suite for ORCANEBInput class."""
+
+    def test_read_neb_input_basic(self, orca_input_nebts_file):
+        """Test basic reading of NEB input file."""
+        neb_inp = ORCANEBInput(filename=orca_input_nebts_file)
+        assert neb_inp is not None
+        assert neb_inp.route_string == "! gfn2-xtb neb-ts freq"
+
+    def test_neb_input_nimages(self, orca_input_nebts_file):
+        """Test reading number of images from NEB input."""
+        neb_inp = ORCANEBInput(filename=orca_input_nebts_file)
+        assert neb_inp.nimages == 16
+
+    def test_neb_input_ending_xyzfile(self, orca_input_nebts_file):
+        """Test reading ending XYZ file from NEB input."""
+        neb_inp = ORCANEBInput(filename=orca_input_nebts_file)
+        assert neb_inp.ending_xyzfile == "S-1a_opt.xyz"
+
+    def test_neb_input_ts_xyzfile(self, orca_input_nebts_file):
+        """Test reading TS XYZ file from NEB input."""
+        neb_inp = ORCANEBInput(filename=orca_input_nebts_file)
+        assert neb_inp.ts_xyzfile == "TS_rot1.xyz"
+
+    def test_neb_input_pre_optimization_false(self, orca_input_nebts_file):
+        """Test reading pre-optimization flag (False) from NEB input."""
+        neb_inp = ORCANEBInput(filename=orca_input_nebts_file)
+        assert neb_inp.pre_optimization is False
+
+    def test_neb_input_starting_xyzfile(self, orca_input_nebts_file):
+        """Test reading starting XYZ file from NEB input."""
+        neb_inp = ORCANEBInput(filename=orca_input_nebts_file)
+        # When using xyzfile syntax, starting_xyzfile should be the filename
+        starting = neb_inp.starting_xyzfile
+        assert starting == "R-1a_opt.xyz"
+
+    def test_neb_input_charge_and_multiplicity(self, orca_input_nebts_file):
+        """Test reading charge and multiplicity from NEB input."""
+        neb_inp = ORCANEBInput(filename=orca_input_nebts_file)
+        assert neb_inp.charge == 0
+        assert neb_inp.multiplicity == 2
+
+    def test_neb_input_inherits_from_orca_input(self, orca_input_nebts_file):
+        """Test that ORCANEBInput inherits from ORCAInput."""
+        neb_inp = ORCANEBInput(filename=orca_input_nebts_file)
+        assert isinstance(neb_inp, ORCAInput)
+        # Should have access to parent class properties
+        assert hasattr(neb_inp, "route_string")
+        assert hasattr(neb_inp, "charge")
+        assert hasattr(neb_inp, "multiplicity")
+
+    def test_neb_input_restarting_allxyzfile_none(self, orca_input_nebts_file):
+        """Test that restarting_allxyzfile is None when not specified."""
+        neb_inp = ORCANEBInput(filename=orca_input_nebts_file)
+        assert neb_inp.restarting_allxyzfile is None
+
+    def test_neb_input_with_preopt_true(self, tmpdir):
+        """Test reading NEB input with pre-optimization enabled."""
+        neb_content = """!gfn2-xtb neb-ci
+%NEB
+  NImages 8
+  NEB_END_XYZFILE "product.xyz"
+  PREOPT_ENDS TRUE
+END
+* xyzfile 0 1 reactant.xyz
+"""
+        neb_file = tmpdir.join("test_neb_preopt.inp")
+        neb_file.write(neb_content)
+
+        neb_inp = ORCANEBInput(filename=str(neb_file))
+        assert neb_inp.pre_optimization is True
+        assert neb_inp.nimages == 8
+        assert neb_inp.ending_xyzfile == "product.xyz"
+
+    def test_neb_input_with_restart_file(self, tmpdir):
+        """Test reading NEB input with restart file."""
+        neb_content = """!xtb2 neb-ts
+%NEB
+  NImages 12
+  Restart_ALLXYZFile "previous_run.allxyz"
+END
+* xyzfile 0 1 start.xyz
+"""
+        neb_file = tmpdir.join("test_neb_restart.inp")
+        neb_file.write(neb_content)
+
+        neb_inp = ORCANEBInput(filename=str(neb_file))
+        assert neb_inp.nimages == 12
+        assert neb_inp.restarting_allxyzfile == "previous_run.allxyz"
+        # When restart is used, ending file might not be specified
+        assert neb_inp.ending_xyzfile is None
+
+    def test_neb_input_case_insensitive(self, tmpdir):
+        """Test that NEB input parsing is case-insensitive."""
+        neb_content = """!XTB2 NEB-TS
+%neb
+  NIMAGES 10
+  neb_end_xyzfile "PRODUCT.xyz"
+  Preopt_Ends false
+end
+* xyzfile 0 1 reactant.xyz
+"""
+        neb_file = tmpdir.join("test_neb_case.inp")
+        neb_file.write(neb_content)
+
+        neb_inp = ORCANEBInput(filename=str(neb_file))
+        assert neb_inp.nimages == 10
+        assert neb_inp.ending_xyzfile == "PRODUCT.xyz"
+        assert neb_inp.pre_optimization is False
+
+    def test_neb_input_without_ts_file(self, tmpdir):
+        """Test reading NEB input without TS guess file."""
+        neb_content = """!xtb2 neb-ci
+%NEB
+  NImages 8
+  NEB_END_XYZFILE "product.xyz"
+END
+* xyzfile 0 1 reactant.xyz
+"""
+        neb_file = tmpdir.join("test_neb_no_ts.inp")
+        neb_file.write(neb_content)
+
+        neb_inp = ORCANEBInput(filename=str(neb_file))
+        assert neb_inp.nimages == 8
+        assert neb_inp.ending_xyzfile == "product.xyz"
+        assert neb_inp.ts_xyzfile is None
+
+    def test_neb_input_all_properties(self, tmpdir):
+        """Test reading all NEB input properties at once."""
+        neb_content = """!B3LYP def2-SVP NEB-TS
+%NEB
+  NImages 20
+  NEB_END_XYZFILE "final_product.xyz"
+  NEB_TS_XYZFILE "ts_guess.xyz"
+  PREOPT_ENDS TRUE
+END
+* xyzfile -1 2 initial_reactant.xyz
+"""
+        neb_file = tmpdir.join("test_neb_all.inp")
+        neb_file.write(neb_content)
+
+        neb_inp = ORCANEBInput(filename=str(neb_file))
+
+        # All NEB-specific properties
+        assert neb_inp.nimages == 20
+        assert neb_inp.ending_xyzfile == "final_product.xyz"
+        assert neb_inp.ts_xyzfile == "ts_guess.xyz"
+        assert neb_inp.pre_optimization is True
+        assert neb_inp.starting_xyzfile == "initial_reactant.xyz"
+        assert neb_inp.restarting_allxyzfile is None
+
+        # Inherited properties
+        assert neb_inp.charge == -1
+        assert neb_inp.multiplicity == 2
 
 
 class TestORCAOutput:
