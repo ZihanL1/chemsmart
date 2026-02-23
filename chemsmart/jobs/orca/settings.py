@@ -2001,7 +2001,8 @@ class ORCANEBJobSettings(ORCAJobSettings):
             # Use basename for scratch compatibility
             ending_file = os.path.basename(self.ending_xyzfile)
             lines.append(f'NEB_END_XYZFile "{ending_file}"')
-            lines.append(f"PREOPT_ENDS {self.preopt_ends}")
+            bool_str = "True" if self.preopt_ends else "False"
+            lines.append(f"PREOPT_ENDS {bool_str}")
             if self.intermediate_xyzfile:
                 # Use basename for scratch compatibility
                 intermediate_file = os.path.basename(self.intermediate_xyzfile)
