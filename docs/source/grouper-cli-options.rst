@@ -37,7 +37,7 @@ These options are shared across all grouping strategies and must be placed BEFOR
 
    -  -  ``-t, --filetype``
       -  string
-      -  File type filter for directory processing (only support log files currently)
+      -  File type filter for directory processing (``gaussian`` or ``orca``)
 
    -  -  ``-l, --label``
       -  string
@@ -175,14 +175,38 @@ Load all structures from a single multi-structure file:
 Directory Mode
 ==============
 
-Load structures from a directory of files (Only for Gaussian TS/Opt log files currently). Files should follow the naming
-convention ``xxx_c1_xxx.log``, ``xxx_c2_xxx.log``, or ``xxx_c1.log``, ``xxx_c2.log``, etc.
+Load structures from a directory of Gaussian or ORCA output files. The program extracts the last structure from each
+file along with the Gibbs free energy.
+
+**Supported file types:**
+
+-  ``gaussian``: Gaussian output files (``.log``, ``.out``)
+-  ``orca``: ORCA output files (``.out``)
+
+**File naming:**
+
+Files with conformer pattern (``xxx_c1_xxx.log``, ``xxx_c2.log``, etc.) will use ``c1``, ``c2``, ... as conformer IDs
+and be sorted numerically. Files without this pattern will use the filename (without extension) as the conformer ID and
+be sorted alphabetically after the numbered conformers.
 
 .. code:: bash
 
-   chemsmart run grouper -d . -t log rmsd
+   chemsmart run grouper -d . -t gaussian rmsd
+   chemsmart run grouper -d . -t orca rmsd
 
-For TS/Opt log files, the program extracts Gibbs free energy (SCF + thermal correction)
+**Validation:**
+
+-  Files must have normal termination
+-  Frequency calculation is required (for Gibbs energy extraction)
+-  For optimization jobs: no imaginary frequencies allowed
+-  For TS jobs: exactly one imaginary frequency required
+
+**Energy extraction:**
+
+For Gaussian and ORCA output files, the program extracts Gibbs free energy directly from the output:
+
+-  Gaussian: "Sum of electronic and thermal Free Energies"
+-  ORCA: "Final Gibbs free energy"
 
 **************
  Output Files

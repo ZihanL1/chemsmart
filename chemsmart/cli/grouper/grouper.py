@@ -6,7 +6,6 @@ for various grouping strategy subcommands (irmsd, tfd, tanimoto, etc.).
 """
 
 import functools
-import glob
 import logging
 import os
 import re
@@ -110,13 +109,15 @@ def grouper(
 
     Input modes:
     - Single file: -f conformers.xyz (all structures from one file)
-    - Directory of logs: -d . -t log (last structure from each log file)
-      Files should have names like 'xxx_c1_opt.log', 'xxx_c12.log', etc.
+    - Directory of output files: -d . -t gaussian (or -t orca)
+      Loads last structure from each output file with conformer pattern.
+      Files should have names like 'xxx_c1_opt.log', 'xxx_c12.out', etc.
 
     Examples:
         chemsmart run grouper -f conformers.xyz irmsd
         chemsmart run grouper -f conformers.xyz -T 0.5 irmsd --inversion on
-        chemsmart run grouper -d . -t log -T 0.5 irmsd
+        chemsmart run grouper -d . -t gaussian -T 0.5 irmsd
+        chemsmart run grouper -d . -t orca -T 0.5 rmsd
         chemsmart run grouper -f conformers.xyz -T 0.1 tfd --use-weights
         chemsmart run grouper -f conformers.xyz -N 10 tanimoto --fingerprint-type morgan
         chemsmart run grouper -f conformers.xyz -o csv rmsd
@@ -142,16 +143,16 @@ def grouper(
             "Must specify -t/--filetype when using -d/--directory."
         )
 
-    # Mode 1: Directory of log files (-d . -t log)
+    # Mode 1: Directory of output files (-d . -t gaussian/orca)
     if directory is not None and filetype is not None:
-        if filetype.lower() != "log":
+        if filetype.lower() not in ("gaussian", "orca"):
             raise click.BadParameter(
-                f"For grouper with directory mode, only 'log' filetype is supported. "
-                f"Got: {filetype}"
+                f"For grouper with directory mode, only 'gaussian' or 'orca' "
+                f"filetypes are supported. Got: {filetype}"
             )
 
-        molecules, conformer_ids, auto_label = (
-            _load_molecules_from_log_directory(directory)
+        molecules, conformer_ids, auto_label = _load_molecules_from_directory(
+            directory, filetype.lower()
         )
         grouper_label = _get_label(label, append_label, auto_label)
         ctx.obj["conformer_ids"] = conformer_ids
@@ -214,80 +215,97 @@ def _extract_conformer_id(filename: str) -> str | None:
     return f"c{match.group(1)}" if match else None
 
 
-def _load_molecules_from_log_directory(directory: str) -> tuple:
+def _load_molecules_from_directory(directory: str, filetype: str) -> tuple:
     """
-    Load molecules from log files in a directory, extracting last structure from each.
+    Load molecules from output files in a directory, extracting last structure from each.
 
-    Only accepts opt or ts job types with frequency calculations:
-    - opt: must have normal termination and no imaginary frequencies
-    - ts: must have normal termination and exactly one imaginary frequency
+    Supports both Gaussian and ORCA output files. Validation is done via
+    Thermochemistry class:
+    - Validates normal termination (via file_object)
+    - Validates imaginary frequencies (via cleaned_frequencies)
 
-    For valid files, the Gibbs free energy (SCF Done + Thermal correction to
-    Gibbs Free Energy) is extracted and stored in mol.energy.
+    Energy extraction:
+    - Gibbs free energy = SCF Done + Thermal correction to Gibbs Free Energy
+    (Extracted directly from output file, no temperature-dependent recalculation)
 
     Args:
-        directory: Path to directory containing log files
+        directory: Path to directory containing output files
+        filetype: Type of output files ('gaussian' or 'orca')
 
     Returns:
         tuple: (list of Molecule, list of conformer_ids, common_label)
 
     Raises:
-        click.BadParameter: If no valid log files found or no molecules loaded
+        click.BadParameter: If no valid output files found or no molecules loaded
     """
-    from chemsmart.io.gaussian.output import Gaussian16Output
+    from chemsmart.analysis.thermochemistry import Thermochemistry
+    from chemsmart.utils.io import find_output_files_in_directory
 
     directory = os.path.abspath(directory)
-    log_files = glob.glob(os.path.join(directory, "*.log"))
+    output_files = find_output_files_in_directory(directory, filetype)
 
-    if not log_files:
+    if not output_files:
         raise click.BadParameter(
-            f"No .log files found in directory: {directory}"
+            f"No {filetype} output files found in directory: {directory}"
         )
 
-    # Extract conformer info and sort by conformer number
+    # Extract conformer info and sort
     file_info = []
-    for f in log_files:
+
+    for f in output_files:
         conf_id = _extract_conformer_id(f)
+        basename = os.path.basename(f)
+        name_without_ext = os.path.splitext(basename)[0]
+
         if conf_id:
+            # Has _cXX_ pattern: use cXX as ID, extract number for sorting
             num = int(re.search(r"\d+", conf_id).group())
-            file_info.append((f, conf_id, num))
+            file_info.append((f, conf_id, num, name_without_ext))
         else:
-            logger.warning(
-                f"Could not extract conformer ID from {f}, skipping"
-            )
+            # No pattern: use filename as ID, use None for number
+            file_info.append((f, name_without_ext, None, name_without_ext))
 
     if not file_info:
         raise click.BadParameter(
-            "No files with conformer pattern (_cXX_) found in directory. "
-            "Expected filenames like 'structure_c1_opt.log' or 'mol_c12.log'"
+            f"No valid output files found in directory: {directory}"
         )
 
-    # Sort by conformer number
-    file_info.sort(key=lambda x: x[2])
+    # Sort: files with _cXX_ pattern by number, others by filename at the end
+    def sort_key(x):
+        if x[2] is not None:
+            return (0, x[2], x[3])  # Has pattern: sort by number first
+        else:
+            return (
+                1,
+                0,
+                x[3],
+            )  # No pattern: sort by filename, after patterned files
+
+    file_info.sort(key=sort_key)
 
     molecules = []
     conformer_ids = []
 
-    for filepath, conf_id, _ in file_info:
+    for filepath, conf_id, _, _ in file_info:
         try:
-            g16_output = Gaussian16Output(filename=filepath)
-
-            # Validate the file
-            is_valid, error_msg = _validate_gaussian_output(
-                g16_output, conf_id
+            # Thermochemistry validates:
+            # - normal_termination (via file_object)
+            # - imaginary frequencies (via cleaned_frequencies in __init__)
+            thermo = Thermochemistry(
+                filename=filepath,
+                temperature=298.15,  # Required by Thermochemistry but not used for energy
+                check_imaginary_frequencies=True,
             )
-            if not is_valid:
-                logger.warning(f"Skipping {conf_id}: {error_msg}")
-                continue
 
-            mol = Molecule.from_filepath(
-                filepath=filepath, index="-1", return_list=False
-            )
+            # Get molecule and set Gibbs energy
+            mol = thermo.molecule
             if mol is not None:
                 mol.name = conf_id
 
-                # Extract Gibbs free energy
-                gibbs_energy = _extract_gibbs_energy(g16_output)
+                # Extract Gibbs free energy from file_object
+                # Both Gaussian16Output and ORCAOutput have gibbs_free_energy property
+                gibbs_energy = thermo.file_object.gibbs_free_energy
+
                 if gibbs_energy is not None:
                     mol._energy = gibbs_energy
                     logger.debug(
@@ -302,6 +320,10 @@ def _load_molecules_from_log_directory(directory: str) -> tuple:
                 conformer_ids.append(conf_id)
             else:
                 logger.warning(f"Could not load molecule from {filepath}")
+
+        except ValueError as e:
+            # Thermochemistry raises ValueError for validation failures
+            logger.warning(f"Skipping {conf_id}: {e}")
         except Exception as e:
             logger.warning(f"Error loading {filepath}: {e}")
 
@@ -324,96 +346,6 @@ def _load_molecules_from_log_directory(directory: str) -> tuple:
     )
 
     return molecules, conformer_ids, common_label
-
-
-def _validate_gaussian_output(g16_output, conf_id: str) -> tuple[bool, str]:
-    """
-    Validate Gaussian output file for grouper usage.
-
-    Requirements:
-    - Must be opt or ts job type
-    - Must have normal termination
-    - opt: no imaginary frequencies
-    - ts: exactly one imaginary frequency
-
-    Args:
-        g16_output: Gaussian16Output object
-        conf_id: Conformer ID for error messages
-
-    Returns:
-        tuple: (is_valid, error_message)
-    """
-    # Check normal termination
-    if not g16_output.normal_termination:
-        return False, "abnormal termination"
-
-    # Check job type
-    jobtype = g16_output.jobtype
-    if jobtype not in ("opt", "ts"):
-        return (
-            False,
-            f"unsupported job type '{jobtype}' (only 'opt' or 'ts' allowed)",
-        )
-
-    # Check for frequency calculation (needed for Gibbs energy)
-    freqs = g16_output.vibrational_frequencies
-    if freqs is None or len(freqs) == 0:
-        return False, "no frequency calculation found"
-
-    # Count imaginary frequencies
-    imaginary_freqs = [f for f in freqs if f < 0]
-    num_imaginary = len(imaginary_freqs)
-
-    if jobtype == "opt":
-        if num_imaginary > 0:
-            return (
-                False,
-                f"opt job has {num_imaginary} imaginary frequency(s), expected 0",
-            )
-    elif jobtype == "ts":
-        if num_imaginary != 1:
-            return (
-                False,
-                f"ts job has {num_imaginary} imaginary frequency(s), expected 1",
-            )
-
-    return True, ""
-
-
-def _extract_gibbs_energy(g16_output) -> float | None:
-    """
-    Extract Gibbs free energy from Gaussian output.
-
-    Gibbs free energy = SCF Done + Thermal correction to Gibbs Free Energy
-
-    Args:
-        g16_output: Gaussian16Output object
-
-    Returns:
-        Gibbs free energy in Hartree, or None if not available
-    """
-    # Get the last SCF energy
-    if not g16_output.scf_energies:
-        return None
-    scf_energy = g16_output.scf_energies[-1]
-
-    # Search for thermal correction to Gibbs free energy
-    thermal_correction = None
-    for line in g16_output.contents:
-        if "Thermal correction to Gibbs Free Energy=" in line:
-            try:
-                thermal_correction = float(line.split()[-1])
-                break
-            except (ValueError, IndexError):
-                # Failed to parse thermal correction value, continue searching
-                logger.debug(
-                    f"Failed to parse thermal correction from line: {line.strip()}"
-                )
-
-    if thermal_correction is None:
-        return None
-
-    return scf_energy + thermal_correction
 
 
 def _get_label(label, append_label, base_label):

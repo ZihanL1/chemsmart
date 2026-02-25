@@ -1015,7 +1015,6 @@ class Test_EnergyGrouper:
         import glob
         import re
 
-        from chemsmart.cli.grouper.grouper import _extract_gibbs_energy
         from chemsmart.io.gaussian.output import Gaussian16Output
         from chemsmart.io.molecules.structure import Molecule
 
@@ -1031,9 +1030,9 @@ class Test_EnergyGrouper:
                 filepath=log_file, index="-1", return_list=False
             )
             if mol is not None:
-                # Extract and set Gibbs energy (this is what CLI does)
+                # Extract and set Gibbs energy using gibbs_free_energy property
                 g16_output = Gaussian16Output(filename=log_file)
-                gibbs_energy = _extract_gibbs_energy(g16_output)
+                gibbs_energy = g16_output.gibbs_free_energy
                 if gibbs_energy is not None:
                     mol._energy = gibbs_energy
 
@@ -1093,8 +1092,7 @@ class Test_EnergyGrouper:
     def test_gibbs_energy_extraction_function(
         self, ts_conformers_log_directory, temp_working_dir
     ):
-
-        from chemsmart.cli.grouper.grouper import _extract_gibbs_energy
+        """Test that Gaussian16Output.gibbs_free_energy extracts correct value."""
         from chemsmart.io.gaussian.output import Gaussian16Output
 
         log_file = os.path.join(
@@ -1109,7 +1107,7 @@ class Test_EnergyGrouper:
             expected_scf + expected_gibbs_correction
         )  # -1401.68245219
 
-        gibbs_energy = _extract_gibbs_energy(g16_output)
+        gibbs_energy = g16_output.gibbs_free_energy
         assert np.isclose(gibbs_energy, expected_gibbs_energy, rtol=1e-6), (
             f"Gibbs energy mismatch: got {gibbs_energy}, "
             f"expected {expected_gibbs_energy}"
@@ -1871,3 +1869,206 @@ class Test_label_and_append_label:
         assert os.path.exists(
             excel_file
         ), f"Excel file not found: {excel_file}"
+
+
+class TestConformerIdExtraction:
+    """Test conformer ID extraction from filenames."""
+
+    @staticmethod
+    def _sort_key(x):
+        """Sort key for file_info: cXX files by number first, then others by filename."""
+        if x[2] is not None:
+            return (0, x[2], x[3])
+        else:
+            return (1, 0, x[3])
+
+    def test_extract_conformer_id_with_pattern(self):
+        """Test extraction with _cXX_ pattern."""
+        from chemsmart.cli.grouper.grouper import _extract_conformer_id
+
+        assert _extract_conformer_id("structure_c1_opt.log") == "c1"
+        assert _extract_conformer_id("mol_c12.log") == "c12"
+        assert (
+            _extract_conformer_id("/path/to/structure_c123_ts.log") == "c123"
+        )
+
+    def test_extract_conformer_id_without_pattern(self):
+        """Test extraction without _cXX_ pattern returns None."""
+        from chemsmart.cli.grouper.grouper import _extract_conformer_id
+
+        assert _extract_conformer_id("mol_opt.log") is None
+        assert _extract_conformer_id("structure.log") is None
+        assert _extract_conformer_id("/path/to/calc.log") is None
+
+    def test_conformer_id_fallback_to_filename(self):
+        """Test that filename is used as conformer ID when no _cXX_ pattern."""
+        from chemsmart.cli.grouper.grouper import _extract_conformer_id
+
+        test_files = [
+            "/path/to/mol_opt.log",
+            "/path/to/structure_ts.out",
+        ]
+
+        conformer_ids = []
+        for f in test_files:
+            conf_id = _extract_conformer_id(f)
+            if conf_id is None:
+                basename = os.path.basename(f)
+                conf_id = os.path.splitext(basename)[0]
+            conformer_ids.append(conf_id)
+
+        assert conformer_ids == ["mol_opt", "structure_ts"]
+
+    def test_conformer_ids_molecules_correspondence(
+        self, ts_conformers_log_directory, temp_working_dir
+    ):
+        """Test that conformer_ids and molecules are strictly one-to-one corresponding.
+
+        This verifies that after sorting, each molecule's energy matches the energy
+        from its corresponding file (identified by conf_id).
+        """
+        import glob
+        import re
+
+        from chemsmart.cli.grouper.grouper import _extract_conformer_id
+        from chemsmart.io.gaussian.output import Gaussian16Output
+        from chemsmart.io.molecules.structure import Molecule
+
+        # First, build a mapping from conf_id to expected gibbs_energy
+        log_files = glob.glob(
+            os.path.join(ts_conformers_log_directory, "*.log")
+        )
+        expected_energies = {}
+
+        for f in log_files:
+            conf_id = _extract_conformer_id(f)
+            basename = os.path.basename(f)
+            name_without_ext = os.path.splitext(basename)[0]
+
+            if conf_id is None:
+                conf_id = name_without_ext
+
+            g16_output = Gaussian16Output(filename=f)
+            gibbs_energy = g16_output.gibbs_free_energy
+            if gibbs_energy is not None:
+                expected_energies[conf_id] = gibbs_energy
+
+        # Now simulate the actual loading logic with sorting
+        file_info = []
+        for f in log_files:
+            conf_id = _extract_conformer_id(f)
+            basename = os.path.basename(f)
+            name_without_ext = os.path.splitext(basename)[0]
+
+            if conf_id:
+                num = int(re.search(r"\d+", conf_id).group())
+                file_info.append((f, conf_id, num, name_without_ext))
+            else:
+                file_info.append((f, name_without_ext, None, name_without_ext))
+
+        file_info.sort(key=self._sort_key)
+
+        # Load molecules
+        molecules = []
+        conformer_ids = []
+
+        for filepath, conf_id, _, _ in file_info:
+            try:
+                mol = Molecule.from_filepath(
+                    filepath=filepath, index="-1", return_list=False
+                )
+                if mol is not None:
+                    g16_output = Gaussian16Output(filename=filepath)
+                    gibbs_energy = g16_output.gibbs_free_energy
+                    if gibbs_energy is not None:
+                        mol._energy = gibbs_energy
+
+                    molecules.append(mol)
+                    conformer_ids.append(conf_id)
+            except Exception:
+                pass
+
+        # Verify one-to-one correspondence
+        assert len(molecules) == len(conformer_ids)
+
+        # Verify each molecule's energy matches the expected energy for its conf_id
+        for i, (mol, conf_id) in enumerate(zip(molecules, conformer_ids)):
+            if conf_id in expected_energies:
+                expected_energy = expected_energies[conf_id]
+                assert np.isclose(mol.energy, expected_energy, rtol=1e-10), (
+                    f"Index {i}: energy mismatch for {conf_id}, "
+                    f"got {mol.energy}, expected {expected_energy}"
+                )
+
+    def test_mixed_pattern_files_correspondence(self):
+        """Test correspondence when mixing files with and without _cXX_ pattern."""
+        from chemsmart.cli.grouper.grouper import _extract_conformer_id
+
+        test_files = [
+            ("mol_c1_opt.log", "c1"),
+            ("mol_c2_opt.log", "c2"),
+            ("other_calc.log", None),
+            ("mol_c3_opt.log", "c3"),
+        ]
+
+        file_info = []
+        for filename, expected_pattern in test_files:
+            conf_id = _extract_conformer_id(filename)
+            basename = os.path.basename(filename)
+            name_without_ext = os.path.splitext(basename)[0]
+
+            if conf_id:
+                assert conf_id == expected_pattern
+                num = int(conf_id.replace("c", ""))
+                file_info.append((filename, conf_id, num, name_without_ext))
+            else:
+                assert expected_pattern is None
+                file_info.append(
+                    (filename, name_without_ext, None, name_without_ext)
+                )
+
+        file_info.sort(key=self._sort_key)
+        sorted_conf_ids = [info[1] for info in file_info]
+
+        # Files with pattern first (sorted by number), then others by filename
+        assert sorted_conf_ids == ["c1", "c2", "c3", "other_calc"]
+
+    def test_all_files_without_cxx_pattern(self):
+        """Test that a folder with no _cXX_ pattern files works correctly."""
+        from chemsmart.cli.grouper.grouper import _extract_conformer_id
+
+        test_files = [
+            "mol_opt.log",
+            "structure_ts.log",
+            "calc.log",
+            "another_mol.log",
+        ]
+
+        file_info = []
+        for filename in test_files:
+            conf_id = _extract_conformer_id(filename)
+            basename = os.path.basename(filename)
+            name_without_ext = os.path.splitext(basename)[0]
+
+            if conf_id:
+                num = int(conf_id.replace("c", ""))
+                file_info.append((filename, conf_id, num, name_without_ext))
+            else:
+                file_info.append(
+                    (filename, name_without_ext, None, name_without_ext)
+                )
+
+        # All files should have None as num
+        for info in file_info:
+            assert info[2] is None
+
+        file_info.sort(key=self._sort_key)
+        sorted_conf_ids = [info[1] for info in file_info]
+
+        # All files sorted alphabetically by filename
+        assert sorted_conf_ids == [
+            "another_mol",
+            "calc",
+            "mol_opt",
+            "structure_ts",
+        ]
