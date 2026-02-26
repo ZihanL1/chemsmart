@@ -20,7 +20,8 @@ pt = PeriodicTable()
 
 
 class BasePreprocessor:
-    """Base preprocessor class with shared logic for Skeleton and Substituent preprocessors."""
+    """Base preprocessor class with shared logic
+    for Skeleton and Substituent preprocessors."""
 
     def __init__(self, molecule: Molecule, link_index: int):
         self.molecule = molecule
@@ -40,7 +41,8 @@ class BasePreprocessor:
         current_bond_order_sum = 0.0
         for neighbor in graph.neighbors(self.link_index):
             edge_data = graph.get_edge_data(self.link_index, neighbor)
-            # Default to 1.0 if bond_order is missing (shouldn't happen with to_graph)
+            # Default to 1.0 if bond_order is missing
+            # (shouldn't happen with to_graph)
             bond_order = edge_data.get("bond_order", 1.0)
             current_bond_order_sum += bond_order
 
@@ -85,7 +87,8 @@ class BasePreprocessor:
             )
             return []
 
-        # For each neighbor, calculate the size of the component if bond is broken.
+        # For each neighbor, calculate the size
+        # of the component if bond is broken.
         # The substituent/group to remove is the smallest component.
         min_component_size = float("inf")
         target_indices = []
@@ -148,7 +151,8 @@ class BasePreprocessor:
 
     def _run_auto_detect(self) -> Molecule:
         """
-        Run auto-detection mode to find and remove the smallest group at link position.
+        Run auto-detection mode to find and remove
+        the smallest group at link position.
 
         Returns
         -------
@@ -188,7 +192,8 @@ class BasePreprocessor:
 
     def _get_fallback_indices(self) -> list[int]:
         """
-        Get indices to use for new link index calculation if run() wasn't called.
+        Get indices to use for new link index
+        calculation if run() wasn't called.
         Default implementation: Auto-detect.
         """
         substituent_indices = self.detect_substituent()
@@ -196,11 +201,13 @@ class BasePreprocessor:
 
 
 class SkeletonPreprocessor(BasePreprocessor):
-    """Preprocessor to prepare skeleton molecule by removing substituent at link position.
+    """Preprocessor to prepare skeleton molecule
+    by removing substituent at link position.
 
     This class handles two scenarios:
     1. User provides skeleton_indices: Keep only atoms at specified indices
-    2. User doesn't provide skeleton_indices: Auto-detect and remove substituent at link position
+    2. User doesn't provide skeleton_indices:
+    Auto-detect and remove substituent at link position
     """
 
     def __init__(
@@ -217,7 +224,8 @@ class SkeletonPreprocessor(BasePreprocessor):
         molecule : Molecule
             Input molecule object
         link_index : int
-            Index of the link atom (1-based, will be converted to 0-based internally)
+            Index of the link atom (1-based, will
+            be converted to 0-based internally)
         skeleton_indices : list[int] | None
             Indices of atoms belonging to skeleton (1-based).
             If None, auto-detection will be used.
@@ -259,12 +267,14 @@ class SkeletonPreprocessor(BasePreprocessor):
             substituent_branches = self._find_non_skeleton_branches()
 
             if len(substituent_branches) == 0:
-                # No substituent to remove at this link_index, return molecule as-is
+                # No substituent to remove at this
+                # link_index, return molecule as-is
                 self._final_indices = list(range(len(self.molecule)))
                 return self.molecule
             elif len(substituent_branches) == 1:
                 # Exactly one substituent branch - remove only this branch
-                # Keep all other atoms (including substituents on other link atoms)
+                # Keep all other atoms (including
+                # substituents on other link atoms)
                 substituent_indices = substituent_branches[0]
                 keep_indices = self._get_complement_indices(
                     substituent_indices
@@ -272,7 +282,8 @@ class SkeletonPreprocessor(BasePreprocessor):
                 self._final_indices = sorted(keep_indices)
                 return self._extract_by_indices(keep_indices)
             else:
-                # Multiple substituent branches - ambiguous, fall back to auto-detection
+                # Multiple substituent branches -
+                # ambiguous, fall back to auto-detection
                 logger.warning(
                     f"Found {len(substituent_branches)} branches without skeleton atoms. "
                     "Falling back to auto-detection mode."
@@ -284,7 +295,8 @@ class SkeletonPreprocessor(BasePreprocessor):
 
     def _find_non_skeleton_branches(self) -> list[list[int]]:
         """
-        Find all branches from link_index that don't contain any skeleton atoms.
+        Find all branches from link_index
+        that don't contain any skeleton atoms.
 
         Uses DFS traversal from link_index to explore each neighbor branch.
         A branch is considered a "non-skeleton branch" (substituent) if none of
@@ -332,7 +344,8 @@ class SkeletonPreprocessor(BasePreprocessor):
         self, graph: nx.Graph, start: int, excluded: int
     ) -> list[int]:
         """
-        Collect all atoms in a branch using DFS, excluding the starting point's parent.
+        Collect all atoms in a branch using DFS,
+        excluding the starting point's parent.
 
         Parameters
         ----------
@@ -373,12 +386,15 @@ class SkeletonPreprocessor(BasePreprocessor):
 
 
 class SubstituentPreprocessor(BasePreprocessor):
-    """Preprocessor to prepare substituent molecule by removing atom/group at link position if needed.
+    """Preprocessor to prepare substituent molecule
+    by removing atom/group at link position if needed.
 
     This class checks if the link atom has an available bonding position.
-    If not, it auto-detects and removes the smallest substituent group at the link position.
+    If not, it auto-detects and removes the
+    smallest substituent group at the link position.
 
-    Unlike SkeletonPreprocessor, SubstituentPreprocessor does not have a "skeleton_indices" concept.
+    Unlike SkeletonPreprocessor, SubstituentPreprocessor
+    does not have a "skeleton_indices" concept.
     It only operates in auto-detect mode when preprocessing is needed.
     """
 
@@ -395,7 +411,8 @@ class SubstituentPreprocessor(BasePreprocessor):
         molecule : Molecule
             Input substituent molecule object
         link_index : int
-            Index of the link atom (1-based, will be converted to 0-based internally)
+            Index of the link atom (1-based, will
+            be converted to 0-based internally)
         """
         super().__init__(molecule, link_index)
 
@@ -435,7 +452,8 @@ class SubstituentPreprocessor(BasePreprocessor):
 
 
 class IterateAnalyzer:
-    """Analyzer for a pair of skeleton and substituent in Iterate job, find the optimal position to place the substituent on skeleton."""
+    """Analyzer for a pair of skeleton and substituent in Iterate job,
+    find the optimal position to place the substituent on skeleton."""
 
     def __init__(
         self,
@@ -458,9 +476,11 @@ class IterateAnalyzer:
         substituent : Molecule
             Substituent molecule object
         skeleton_link_index : int
-            Index of the link atom in skeleton (1-based, will be converted to 0-based internally)
+            Index of the link atom in skeleton (1-based,
+            will be converted to 0-based internally)
         substituent_link_index : int
-            Index of the link atom in substituent (1-based, will be converted to 0-based internally)
+            Index of the link atom in substituent (1-based,
+            will be converted to 0-based internally)
         buffer : float
             Buffer for min distance constraint (default: 0.3 Å)
         method : str
@@ -488,7 +508,8 @@ class IterateAnalyzer:
         Returns
         -------
         Molecule or None
-            Combined molecule with skeleton and optimally positioned substituent,
+            Combined molecule with skeleton and
+            optimally positioned substituent,
             or None if optimization failed.
         """
         # Convert Molecule to np.ndarray [atomic_number, x, y, z]
@@ -527,7 +548,8 @@ class IterateAnalyzer:
         mol: Molecule, new_positions: np.ndarray
     ) -> Molecule:
         """
-        Create a new Molecule with updated positions, preserving other attributes.
+        Create a new Molecule with updated
+        positions, preserving other attributes.
 
         Parameters
         ----------
@@ -633,7 +655,8 @@ class IterateAnalyzer:
     @staticmethod
     def _calc_relative_coords(mol: np.ndarray, base_index: int) -> np.ndarray:
         """
-        Calculate relative coordinates of all atoms with respect to a base atom.
+        Calculate relative coordinates of all
+        atoms with respect to a base atom.
 
         Parameters
         ----------
@@ -646,7 +669,8 @@ class IterateAnalyzer:
         -------
         np.ndarray
             Array of shape (n, 4), same format as input, but with coordinates
-            relative to the base atom. The base atom will have coordinates (0, 0, 0).
+            relative to the base atom. The base
+            atom will have coordinates (0, 0, 0).
         """
         n = mol.shape[0]
         if base_index < 0 or base_index >= n:
@@ -672,20 +696,26 @@ class IterateAnalyzer:
         axial_rotations_sample_num: int = 6,
     ) -> Optional[np.ndarray]:
         """
-        Find the optimal position for a substituent molecule (sub) to be attached to a
-        skeleton molecule, such that the total distance sum is maximized while avoiding
+        Find the optimal position for a substituent
+        molecule (sub) to be attached to a
+        skeleton molecule, such that the total
+        distance sum is maximized while avoiding
         atomic overlaps.
 
-        The optimization is performed by finding the optimal position for the link atom
-        in sub (sub_link), and then placing all other atoms in sub according to their
+        The optimization is performed by finding
+        the optimal position for the link atom
+        in sub (sub_link), and then placing all
+        other atoms in sub according to their
         relative positions to sub_link.
 
         Parameters
         ----------
         skeleton_coord : np.ndarray
-            Skeleton molecule, shape (n, 4), each row is [atomic_number, x, y, z]
+            Skeleton molecule, shape (n, 4),
+            each row is [atomic_number, x, y, z]
         sub_coord : np.ndarray
-            Substituent molecule, shape (m, 4), each row is [atomic_number, x, y, z]
+            Substituent molecule, shape (m, 4),
+            each row is [atomic_number, x, y, z]
         skeleton_link_index : int
             Index of the link atom in skeleton (0-based)
         sub_link_index : int
@@ -710,11 +740,13 @@ class IterateAnalyzer:
         -----------
         1. All atoms in sub maintain their relative positions to sub_link
         2. Distance(sub_link, skeleton_link) = bond_dist (equality constraint)
-        3. Distance(sub_i, skeleton_j) >= min_dist for all i, j (inequality constraints)
+        3. Distance(sub_i, skeleton_j) >= min_dist
+        for all i, j (inequality constraints)
 
         Objective
         ---------
-        Maximize: sum of all pairwise distances between sub atoms and skeleton atoms
+        Maximize: sum of all pairwise distances
+        between sub atoms and skeleton atoms
         """
         n_skeleton = skeleton_coord.shape[0]
         n_sub = sub_coord.shape[0]
@@ -741,7 +773,8 @@ class IterateAnalyzer:
         # Get skeleton coordinates
         skeleton_coords = skeleton_coord[:, 1:4]  # shape (n, 3)
 
-        # Calculate bond distance for equality constraint (sub_link to skeleton_link)
+        # Calculate bond distance for equality
+        # constraint (sub_link to skeleton_link)
         sub_link_element = sub_elements[sub_link_index]
         skeleton_link_element = skeleton_elements[skeleton_link_index]
         bond_dist = (
@@ -787,7 +820,8 @@ class IterateAnalyzer:
     @staticmethod
     def _fibonacci_sphere(num_points: int) -> np.ndarray:
         """
-        Generate nearly uniformly distributed unit vectors on a sphere using the Fibonacci lattice algorithm.
+        Generate nearly uniformly distributed unit vectors
+        on a sphere using the Fibonacci lattice algorithm.
 
         Parameters
         ----------
@@ -797,7 +831,8 @@ class IterateAnalyzer:
         Returns
         -------
         np.ndarray
-            Array of shape (num_points, 3) containing the Cartesian coordinates (x, y, z)
+            Array of shape (num_points, 3) containing
+            the Cartesian coordinates (x, y, z)
             of the generated unit vectors.
         """
         indices = np.arange(num_points, dtype=float)
@@ -856,13 +891,15 @@ class IterateAnalyzer:
         sub_link_index : int
             Index of the link atom in sub (0-based)
         ineq_mask : np.ndarray
-            Mask to exclude link-link pair from inequality constraints, shape (m, n)
+            Mask to exclude link-link pair from
+            inequality constraints, shape (m, n)
         sphere_direction_samples_num : int
             Number of points to sample on the unit sphere
         axial_rotations_sample_num : int
             Number of axial rotations per sphere point
         ineq_mask : np.ndarray
-            Mask to exclude link-link pair from inequality constraints, shape (m, n)
+            Mask to exclude link-link pair from
+            inequality constraints, shape (m, n)
 
         Returns
         -------
@@ -891,11 +928,15 @@ class IterateAnalyzer:
             """
             Objective function to minimize.
 
-            We want to find a conformation where the substituent is as "far away"
-            from the skeleton as possible to avoid crowding, while satisfying constraints.
-            Mathematically, we maximize the sum of all pairwise distances between
+            We want to find a conformation where
+            the substituent is as "far away"
+            from the skeleton as possible to avoid
+            crowding, while satisfying constraints.
+            Mathematically, we maximize the sum
+            of all pairwise distances between
             substituent atoms and skeleton atoms.
-            Since scipy.optimize.minimize finds the minimum, we return the negative sum.
+            Since scipy.optimize.minimize finds the
+            minimum, we return the negative sum.
 
             Parameters
             ----------
@@ -920,7 +961,8 @@ class IterateAnalyzer:
             Equality constraint function.
 
             Ensures that the distance between the skeleton's link atom and the
-            substituent's link atom is exactly equal to the target bond distance.
+            substituent's link atom is exactly
+            equal to the target bond distance.
 
             Constraint equation: distance^2 - target_bond_dist^2 = 0
 
@@ -944,7 +986,8 @@ class IterateAnalyzer:
 
             Ensures that no atoms overlap (steric hindrance check).
             For every pair of atoms (one from substituent, one from skeleton),
-            the distance must be greater than or equal to the minimum allowed distance
+            the distance must be greater than or
+            equal to the minimum allowed distance
             (sum of covalent radii + buffer).
 
             Constraint equation: distance^2 - min_dist^2 >= 0
@@ -974,8 +1017,10 @@ class IterateAnalyzer:
             return constraints
 
         # Initial guess
-        # 1. Position: Find optimal initial position for sub_link on the constraint sphere
-        # We run a preliminary optimization to place the sub_link atom as far as possible
+        # 1. Position: Find optimal initial position
+        # for sub_link on the constraint sphere
+        # We run a preliminary optimization to
+        # place the sub_link atom as far as possible
         # from the rest of the skeleton, while maintaining the bond distance.
 
         # Initial guess for the preliminary optimization (projection)
@@ -1003,11 +1048,15 @@ class IterateAnalyzer:
 
         def objective_maximize_separation(link_pos_candidate):
             """
-            Objective function for preliminary optimization: Maximize separation.
+            Objective function for preliminary
+            optimization: Maximize separation.
 
-            Calculates the negative sum of distances between the candidate link position
-            and all skeleton atoms. Minimizing this value maximizes the total distance,
-            effectively pushing the substituent's anchor point away from the skeleton bulk.
+            Calculates the negative sum of distances
+            between the candidate link position
+            and all skeleton atoms. Minimizing this
+            value maximizes the total distance,
+            effectively pushing the substituent's
+            anchor point away from the skeleton bulk.
 
             Parameters
             ----------
@@ -1029,7 +1078,8 @@ class IterateAnalyzer:
             """
             Geometric constraint: Bond length preservation.
 
-            Ensures the distance between the candidate link position and the skeleton's
+            Ensures the distance between the
+            candidate link position and the skeleton's
             link atom equals the required bond distance.
 
             Equation: |pos - skeleton_link|^2 - bond_dist^2 = 0
@@ -1073,14 +1123,16 @@ class IterateAnalyzer:
         best_val = float("inf")
 
         # Sampling parameters for global search
-        # sphere_direction_samples_num and axial_rotations_sample_num are passed as arguments
+        # sphere_direction_samples_num and
+        # axial_rotations_sample_num are passed as arguments
 
         # Generate uniformly distributed unit vectors on the sphere
         sphere_sample_vectors = IterateAnalyzer._fibonacci_sphere(
             sphere_direction_samples_num
         )
 
-        # Determine the principal axis of the substituent relative to its link atom.
+        # Determine the principal axis of the
+        # substituent relative to its link atom.
         # This vector represents the general direction of the substituent body.
         sub_centroid_vector = np.mean(relative_offsets, axis=0)
         sub_centroid_norm = np.linalg.norm(sub_centroid_vector)
@@ -1103,7 +1155,8 @@ class IterateAnalyzer:
         for i in range(sphere_direction_samples_num):
             target_vec = sphere_sample_vectors[i : i + 1]  # shape (1, 3)
 
-            # Find rotation that aligns the substituent's principal axis to the target vector
+            # Find rotation that aligns the substituent's
+            # principal axis to the target vector
             R_align, _ = Rotation.align_vectors(
                 target_vec, sub_principal_axis_reshaped
             )
@@ -1130,13 +1183,15 @@ class IterateAnalyzer:
                         options={"ftol": 1e-6, "maxiter": 1000},
                     )
 
-                    # Prioritize successful runs with lower objective value (max distance)
+                    # Prioritize successful runs with
+                    # lower objective value (max distance)
                     if opt_result.success:
                         if opt_result.fun < best_val:
                             best_val = opt_result.fun
                             best_result = opt_result
                     else:
-                        # If optimization failed, but we don't have any success yet, keep it as fallback
+                        # If optimization failed, but we don't
+                        # have any success yet, keep it as fallback
                         if best_result is None:
                             best_result = opt_result
                 except Exception as e:
