@@ -12,6 +12,7 @@ from chemsmart.utils.io import (
     convert_string_indices_to_pymol_id_indices,
     get_program_type_from_file,
     increment_numbers,
+    is_xyzfile,
     load_molecules_from_paths,
     match_outfile_pattern,
     normalize_metal_bonds,
@@ -140,21 +141,50 @@ class TestGetOutfileFormat:
         assert result == "unknown"
         os.unlink(f.name)
 
-    def test_thermochemistry_from_filepath_gaussian(
-        self, gaussian_singlet_opt_outfile
-    ):
+    def test_thermochemistry_init_gaussian(self, gaussian_singlet_opt_outfile):
         from chemsmart.analysis.thermochemistry import Thermochemistry
 
-        thermo = Thermochemistry.from_filepath(gaussian_singlet_opt_outfile)
+        thermo = Thermochemistry(filename=gaussian_singlet_opt_outfile)
         assert thermo.filename == gaussian_singlet_opt_outfile
         assert thermo.electronic_energy is not None
 
-    def test_thermochemistry_from_filepath_orca(self, water_output_gas_path):
+    def test_thermochemistry_init_orca(self, water_output_gas_path):
         from chemsmart.analysis.thermochemistry import Thermochemistry
 
-        thermo = Thermochemistry.from_filepath(water_output_gas_path)
+        thermo = Thermochemistry(filename=water_output_gas_path)
         assert thermo.filename == water_output_gas_path
         assert thermo.electronic_energy is not None
+
+
+class TestIsXYZFile:
+    """Tests for is_xyzfile (detect XYZ text with non-.xyz extensions)."""
+
+    def test_true_for_crest_dynamics_trj(self, crest_octane_outfolder):
+        crest_dynamics_trj = os.path.join(
+            crest_octane_outfolder, "crest_dynamics.trj"
+        )
+        assert is_xyzfile(crest_dynamics_trj) is True
+
+    def test_true_for_crestopt_log(self, crest_octane_outfolder):
+        crestopt_log = os.path.join(crest_octane_outfolder, "crestopt.log")
+        assert is_xyzfile(crestopt_log) is True
+
+    def test_true_for_crest_conformers_xyz(self, crest_octane_outfolder):
+        crest_conformers_xyz = os.path.join(
+            crest_octane_outfolder, "crest_conformers.xyz"
+        )
+        assert is_xyzfile(crest_conformers_xyz) is True
+
+    def test_true_for_standard_xyz(self, single_molecule_xyz_file):
+        assert is_xyzfile(single_molecule_xyz_file) is True
+
+    def test_false_for_gaussian_log(self, gaussian_singlet_opt_outfile):
+        assert is_xyzfile(gaussian_singlet_opt_outfile) is False
+
+    def test_false_for_random_text(self, tmp_path):
+        path = tmp_path / "not_xyz.log"
+        path.write_text("Entering Gaussian System\nsome more text\n")
+        assert is_xyzfile(str(path)) is False
 
 
 class TestCleanDuplicateStructure:

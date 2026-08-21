@@ -13,7 +13,7 @@ from chemsmart.cli.job import (
 from chemsmart.database.utils import is_chemsmart_database
 from chemsmart.io.molecules.structure import Molecule
 from chemsmart.utils.cli import MyGroup
-from chemsmart.utils.io import clean_label
+from chemsmart.utils.io import clean_label, get_program_type_from_file
 from chemsmart.utils.utils import return_objects_and_indices_from_string_index
 
 logger = logging.getLogger(__name__)
@@ -593,7 +593,26 @@ def gaussian(
     elif filename.endswith((".com", ".gjf", ".inp", ".out", ".log")):
         # filename supplied - we would want to use the settings from here
         #  and do not use any defaults!
-        job_settings = GaussianJobSettings.from_filepath(filename)
+        if filename.endswith(".out") and (
+            get_program_type_from_file(filename) == "xtb"
+        ):
+            # xTB output is only a geometry source; its route/method do not
+            # map onto Gaussian settings. Start from defaults (like .xyz) but
+            # inherit charge/multiplicity from the xTB calculation so the new
+            # Gaussian job is fully specified. CLI -c/-m still override below.
+            logger.info(
+                f"Detected xTB output {filename}; using default Gaussian "
+                f"settings with geometry and charge/multiplicity from the "
+                f"xTB calculation."
+            )
+            job_settings = GaussianJobSettings.default()
+            xtb_molecule = Molecule.from_filepath(filename)
+            if xtb_molecule.charge is not None:
+                job_settings.charge = xtb_molecule.charge
+            if xtb_molecule.multiplicity is not None:
+                job_settings.multiplicity = xtb_molecule.multiplicity
+        else:
+            job_settings = GaussianJobSettings.from_filepath(filename)
     elif filename.endswith(".db"):
         if is_chemsmart_db:
             job_settings = GaussianJobSettings.from_database(
@@ -737,16 +756,12 @@ def gaussian(
                 f"Obtained {len(molecules)} molecule {molecules} from {filename}"
             )
 
-        if pubchem:
-            molecules = Molecule.from_pubchem(
-                identifier=pubchem, return_list=True
-            )
-            assert (
-                molecules is not None
-            ), f"Could not obtain molecule from PubChem {pubchem}!"
-            logger.debug(
-                f"Obtained molecule {molecules} from PubChem {pubchem}"
-            )
+    if pubchem and not is_pka_table_input:
+        molecules = Molecule.from_pubchem(identifier=pubchem, return_list=True)
+        assert (
+            molecules is not None
+        ), f"Could not obtain molecule from PubChem {pubchem}!"
+        logger.debug(f"Obtained molecule {molecules} from PubChem {pubchem}")
 
     # update labels
     if label is not None and append_label is not None:
@@ -765,7 +780,10 @@ def gaussian(
                 label = f"{label}_RI-{record_index}"
         label = f"{label}_{append_label}"
     if label is None and append_label is None:
-        label = os.path.splitext(os.path.basename(filename))[0]
+        if filename:
+            label = os.path.splitext(os.path.basename(filename))[0]
+        else:
+            label = "output"
         if is_chemsmart_db:
             if structure_id is not None:
                 label = f"{label}_SID-{structure_id}"
@@ -773,12 +791,7 @@ def gaussian(
                 label = f"{label}_RID-{record_id}"
             elif record_index is not None:
                 label = f"{label}_RI-{record_index}"
-        if filename:
-            label = os.path.splitext(os.path.basename(filename))[0]
-        else:
-            label = "output"
-        if ctx.invoked_subcommand:
-            label = f"{label}_{ctx.invoked_subcommand}"
+        label = f"{label}_{ctx.invoked_subcommand}"
     label = clean_label(label)
 
     # if user has specified an index to use to access particular structure

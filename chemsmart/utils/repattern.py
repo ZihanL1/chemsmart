@@ -127,6 +127,10 @@ orca_date_pattern = (
     r"\* Starting time:\s+(\w{3} \w{3}\s+\d+ \d{2}:\d{2}:\d{2} \d{4})"
 )
 
+xtb_date_pattern = (
+    r"\* finished run on (\d{4}/\d{2}/\d{2}) at (\d{2}:\d{2}:\d{2})"
+)
+
 
 # filename pattern for gaussian output files
 
@@ -160,6 +164,14 @@ gaussian_opt_keywords_pattern = r"\bopt\s*(=\s*(\([^)]*\)|\w+))?\s*"
 gaussian_freq_keywords_pattern = r"\bfreq\b\s*(=\s*\w+)?\s*"
 
 gaussian_date_pattern = r"Normal termination of Gaussian.* at (.+)\."
+
+# Gaussian ONIOM/MM atom labels: Element-Type-Charge (negative uses Type--0.65)
+gaussian_mm_element_type_charge_neg_pattern = (
+    r"^([A-Za-z][a-z]?)-(.+)--(\d+(?:\.\d+)?)$"
+)
+gaussian_mm_element_type_charge_pos_pattern = (
+    r"^([A-Za-z][a-z]?)-(.+)-(\d+(?:\.\d+)?)$"
+)
 
 # Pattern to find multiple consecutive spaces in strings
 element_partition_split_pattern = r"[\s:_-]+"

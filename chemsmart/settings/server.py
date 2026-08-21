@@ -7,10 +7,10 @@ from functools import lru_cache
 
 from chemsmart.io.yaml import YAMLFile
 from chemsmart.settings.submitters import Submitter
-from chemsmart.settings.user import ChemsmartUserSettings
+from chemsmart.settings.user import CHEMSMARTUserSettings
 from chemsmart.utils.mixins import RegistryMixin, cached_property
 
-user_settings = ChemsmartUserSettings()
+user_settings = CHEMSMARTUserSettings()
 
 logger = logging.getLogger(__name__)
 
@@ -626,7 +626,7 @@ class Server(RegistryMixin):
             # Use shell=True if the command has shell operators
             p = subprocess.Popen(command, shell=True)
         else:
-            p = subprocess.Popen(shlex.split(command), cwd=job.folder)
+            p = subprocess.Popen(shlex.split(command))
         return p.wait()
 
     def submit_array_job(
@@ -690,7 +690,7 @@ class Server(RegistryMixin):
             # Use shell=True if the command has shell operators
             p = subprocess.Popen(command, shell=True)
         else:
-            p = subprocess.Popen(shlex.split(command), cwd=job.folder)
+            p = subprocess.Popen(shlex.split(command))
         return p.wait()
 
 
