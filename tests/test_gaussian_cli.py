@@ -29,6 +29,7 @@ from click.testing import CliRunner
 import chemsmart.cli.gaussian.traj  # noqa: F401 - ensures module is cached
 from chemsmart.cli.gaussian.gaussian import gaussian
 from chemsmart.jobs.gaussian.writer import GaussianInputWriter
+from chemsmart.utils.cli import CtxObjArguments
 from tests.helpers import (
     make_cli_ctx_obj,
     run_gaussian_and_capture_settings,
@@ -1951,7 +1952,9 @@ class TestGaussianCLIWbiCommand:
         options,
         expected_pop,
     ):
-        result = CliRunner().invoke(
+        ctx_obj = make_cli_ctx_obj(gaussian_jobrunner_no_scratch)
+        runner = CliRunner()
+        result = runner.invoke(
             gaussian,
             [
                 "-p",
@@ -1967,11 +1970,23 @@ class TestGaussianCLIWbiCommand:
                 "wbi",
                 *options,
             ],
-            obj=make_cli_ctx_obj(gaussian_jobrunner_no_scratch),
+            obj=ctx_obj,
             standalone_mode=False,
         )
         assert result.exit_code == 0, result.output
-        GaussianInputWriter(job=result.return_value).write(
+        worker_args = CtxObjArguments(
+            ctx_obj["subcommand"], entry_point="gaussian"
+        ).reconstruct_command_line()[1:]
+        version = "3.1" if not options else "7"
+        assert worker_args[worker_args.index("--version") + 1] == version
+        worker_result = runner.invoke(
+            gaussian,
+            worker_args,
+            obj=make_cli_ctx_obj(gaussian_jobrunner_no_scratch),
+            standalone_mode=False,
+        )
+        assert worker_result.exit_code == 0, worker_result.output
+        GaussianInputWriter(job=worker_result.return_value).write(
             target_directory=tmp_path
         )
 

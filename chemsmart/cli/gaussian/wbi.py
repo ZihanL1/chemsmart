@@ -15,14 +15,13 @@ logger = logging.getLogger(__name__)
 @click.option(
     "-v",
     "--version",
-    "nbo_version",
     type=click.Choice(["3.1", "7"]),
     default="3.1",
     show_default=True,
     help="NBO version to use for Wiberg bond indices.",
 )
 @click.pass_context
-def wbi(ctx, nbo_version, **kwargs):
+def wbi(ctx, version, **kwargs):
     """CLI subcommand for running Gaussian WBI jobs."""
 
     # get jobrunner for running Gaussian WBI jobs
@@ -41,11 +40,11 @@ def wbi(ctx, nbo_version, **kwargs):
     # merge project settings with job settings from cli keywords from
     # cli.gaussian.py subcommands
     wbi_settings = wbi_settings.merge(job_settings, keywords=keywords)
-    if nbo_version == "7" and wbi_settings.route_to_be_written is not None:
+    if version == "7" and wbi_settings.route_to_be_written is not None:
         raise click.UsageError(
             "For a custom route, specify pop=nbo7read directly in the route."
         )
-    wbi_settings.nbo_version = nbo_version
+    wbi_settings.nbo_version = version
     check_charge_and_multiplicity(wbi_settings)
 
     # get molecule
