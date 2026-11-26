@@ -88,6 +88,7 @@ class GaussianJobSettings(MolecularJobSettings):
         append_additional_info=None,
         forces=False,
         input_string=None,
+        nbo_version="3.1",
         **kwargs,
     ):
         """
@@ -124,6 +125,7 @@ class GaussianJobSettings(MolecularJobSettings):
             append_additional_info (str, optional): Additional input content.
             forces (bool): Calculate forces.
             input_string (str, optional): Custom input string.
+            nbo_version (str): NBO version for WBI calculations.
             **kwargs: Additional keyword arguments.
 
         Raises:
@@ -155,6 +157,7 @@ class GaussianJobSettings(MolecularJobSettings):
             **kwargs,
         )
         self.chk = chk
+        self.nbo_version = nbo_version
         self.dieze_tag = dieze_tag
         self.additional_solvent_options = additional_solvent_options
         self.additional_opt_options_in_route = additional_opt_options_in_route
@@ -770,8 +773,9 @@ class GaussianJobSettings(MolecularJobSettings):
             route_string += " output=wfn"  # output wavefunction file for NCI
             logger.debug("Added NCI-specific output=wfn keyword")
         elif self.jobtype == "wbi":
-            route_string += " pop=nboread"  # write bond order matrix
-            logger.debug("Added WBI-specific pop=nboread keyword")
+            nbo_keyword = "nbo7read" if self.nbo_version == "7" else "nboread"
+            route_string += f" pop={nbo_keyword}"
+            logger.debug("Added WBI-specific pop=%s keyword", nbo_keyword)
         return route_string
 
     @property

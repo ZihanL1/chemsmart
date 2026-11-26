@@ -28,6 +28,7 @@ from click.testing import CliRunner
 
 import chemsmart.cli.gaussian.traj  # noqa: F401 - ensures module is cached
 from chemsmart.cli.gaussian.gaussian import gaussian
+from chemsmart.jobs.gaussian.writer import GaussianInputWriter
 from tests.helpers import (
     make_cli_ctx_obj,
     run_gaussian_and_capture_settings,
@@ -1934,29 +1935,56 @@ class TestGaussianCLINciCommand:
 class TestGaussianCLIWbiCommand:
     """CLI tests for the ``wbi`` (Wiberg bond index) subcommand."""
 
-    def test_wbi_job_creation(
+    @pytest.mark.parametrize(
+        ("options", "expected_pop"),
+        [
+            ((), "pop=nboread"),
+            (("-v", "7"), "pop=nbo7read"),
+            (("--version", "7"), "pop=nbo7read"),
+        ],
+    )
+    def test_wbi_writes_expected_gaussian_input(
         self,
+        tmp_path,
         single_molecule_xyz_file,
         gaussian_jobrunner_no_scratch,
+        options,
+        expected_pop,
     ):
-        """``wbi`` subcommand creates a ``GaussianWBIJob``."""
-        result, settings = run_gaussian_and_capture_settings(
-            "chemsmart.jobs.gaussian.wbi.GaussianWBIJob",
+        result = CliRunner().invoke(
+            gaussian,
             [
                 "-p",
                 "gas_solv",
                 "-f",
                 single_molecule_xyz_file,
+                "-l",
+                "wbi_input",
                 "-c",
                 "0",
                 "-m",
                 "1",
                 "wbi",
+                *options,
             ],
-            make_cli_ctx_obj(gaussian_jobrunner_no_scratch),
+            obj=make_cli_ctx_obj(gaussian_jobrunner_no_scratch),
+            standalone_mode=False,
         )
         assert result.exit_code == 0, result.output
-        assert settings is not None, "GaussianWBIJob was never instantiated"
+        GaussianInputWriter(job=result.return_value).write(
+            target_directory=tmp_path
+        )
+
+        contents = (tmp_path / "wbi_input.com").read_text().lower()
+        route = next(
+            line for line in contents.splitlines() if line.startswith("#")
+        )
+        pop_keywords = [
+            keyword for keyword in route.split() if keyword.startswith("pop=")
+        ]
+        assert pop_keywords == [expected_pop]
+        assert contents.rstrip("\n").endswith("\n\n$nbo bndidx $end")
+        assert contents.endswith("\n\n")
 
 
 class TestGaussianCLILinkCommand:

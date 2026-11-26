@@ -274,7 +274,24 @@ Run Wiberg Bond Index (WBI) calculations for bond analysis.
 
 .. code:: bash
 
-   chemsmart sub [OPTIONS] gaussian [GAUSSIAN_OPTIONS] wbi
+   chemsmart sub [OPTIONS] gaussian [GAUSSIAN_OPTIONS] wbi [SUBCMD_OPTIONS]
+
+WBI Options
+===========
+
+.. list-table::
+   :header-rows: 1
+   :widths: 28 18 14 40
+
+   -  -  Option
+      -  Accepted values
+      -  Default
+      -  Description
+
+   -  -  ``-v, --version``
+      -  ``3.1``, ``7``
+      -  ``3.1``
+      -  Use Gaussian's built-in NBO 3.1 (``pop=nboread``) or the external NBO 7 interface (``pop=nbo7read``).
 
 Basic Usage
 ===========
@@ -283,4 +300,16 @@ Basic Usage
 
    chemsmart sub gaussian -p project -f opt.log wbi
 
-This adds the keyword ``pop=nboread`` for NBO3.1 software analysis.
+This uses Gaussian's built-in NBO 3.1 via ``pop=nboread``. To use NBO 7 and keep its output separate from a previous NBO
+3.1 run:
+
+.. code:: bash
+
+   chemsmart sub gaussian -p project -f opt.log -l opt_wbi_nbo7 wbi --version 7
+
+This uses ``pop=nbo7read``. For a custom route, include ``pop=nbo7read`` in the route itself.
+
+.. note::
+
+   NBO 7 requires **Gaussian 16 Rev. C.01 or later** and a configured external NBO 7 interface on the machine that runs
+   the job.
